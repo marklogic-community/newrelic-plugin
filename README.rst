@@ -4,20 +4,14 @@ newrelic\_marklogic
 `NewRelic <http://www.newrelic.com>`__ plugin for monitoring
 MarkLogic.
 
-WARNING !
----------
-
-This plugin is currently 'under development' be warned that things are
-likely to change, break or just not work.
-
 Features
 --------
 
 -  easy to install
 -  configurable selection of metrics
--  summary metrics on the local cluster, hosts, servers & forests.
--  detail metrics on databases, forests, hosts, groups & servers.
--  proxy to access NewRelic api
+-  retrieve summary metrics on local cluster, hosts, servers & forests.
+-  retrieve detail metrics on databases, forests, hosts, groups & servers.
+-  proxy access NewRelic api
 
 Before you start
 ----------------
@@ -39,7 +33,7 @@ Install the plugin using any of the following methods.
 
     ``pip install https://github.com/marklogic/newrelic-plugin/archive/master.zip``
 
-2) install from pypi repository (WARNING - not released yet)
+2) install from pypi repository
 
     ``pip install newrelic-marklogic-plugin``
 
@@ -47,7 +41,6 @@ Install the plugin using any of the following methods.
 
     ``python setup.py install``
 
-4) install via `NewRelic Plugin central <https://newrelic.com/plugins>`__ (WARNING - not released yet).
 
 Next step is to create and edit configuration file.
 
@@ -62,7 +55,8 @@ Start reporting metrics to NewRelic by running the following.
 
     ``newrelic_marklogic.py -c newrelic_marklogic.conf``
 
-Sampling metrics every period defined as the length of duration configuration.
+Which will sample metrics every period of length duration as set within configuration.
+
 
 Usage
 -----

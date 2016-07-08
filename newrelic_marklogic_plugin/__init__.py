@@ -33,7 +33,7 @@ import ConfigParser  # TBD- python 3.5 does not have this module
 import newrelic_utils
 from marklogic_status import MarkLogicStatus
 
-__version__ = '0.1.2'
+__version__ = '0.1.3'
 
 
 decl = {
