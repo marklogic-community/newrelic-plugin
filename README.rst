@@ -16,9 +16,9 @@ Features
 Before you start
 ----------------
 
-Minimally `Python 2.7.10  <https://www.python.org/>`__.
+Minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
 
-Minimally `MarkLogic v8.0-4 <http://developer.marklogic.com/products>`__ setup
+Minimally `MarkLogic v8.0-4 <http://developer.marklogic.com/products>`__ installed
 and running.
 
 Require `NewRelic <http://www.newrelic.com/>`__ account.
