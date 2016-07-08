@@ -37,11 +37,11 @@ Install the plugin using any of the following methods.
 
 1) install direct from github
 
-    ``pip install https://github.com/jamfuller/newrelic_marklogic/archive/master.zip``
+    ``pip install https://github.com/marklogic/newrelic-plugin/archive/master.zip``
 
 2) install from pypi repository (WARNING - not released yet)
 
-    ``pip install newrelic_marklogic``
+    ``pip install newrelic-marklogic-plugin``
 
 3) download `release <../../releases>`__  (or clone) repository and run the following.
 

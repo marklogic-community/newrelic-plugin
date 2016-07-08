@@ -32,13 +32,13 @@ class PluginTests(unittest.TestCase):
 
     def testRunPlugin(self):
         self.held, sys.stdout = sys.stdout, StringIO()
-        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='build/newrelic_marklogic_plugin.log',
+        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',
                                                    confFile='etc/newrelic_marklogic.conf.sample')
         nrml.statusUpdate()
         self.assertEqual(sys.stdout.getvalue().strip(),'')
 
     def testConfigFile(self):
-        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='build/newrelic_marklogic_plugin.log',
+        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',
                                                    confFile='etc/newrelic_marklogic.conf.sample')
         nrml.statusUpdate()
         self.assertEqual(nrml.ml_user, "admin")
@@ -46,7 +46,7 @@ class PluginTests(unittest.TestCase):
 
     def testUsageMessage(self):
         self.held, sys.stdout = sys.stdout, StringIO()
-        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='build/newrelic_marklogic_plugin.log',
+        nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',
                                                    confFile='etc/newrelic_marklogic.conf.sample')
         nrml.usage()
         self.assertEqual(sys.stdout.getvalue().strip(),
