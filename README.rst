@@ -22,9 +22,9 @@ Features
 Before you start
 ----------------
 
-Require `python <https://www.python.org/>`__.
+Minimally `Python 2.7.10  <https://www.python.org/>`__.
 
-Require `MarkLogic <http://developer.marklogic.com/products>`__ setup
+Minimally `MarkLogic v8.0-4 <http://developer.marklogic.com/products>`__ setup
 and running.
 
 Require `NewRelic <http://www.newrelic.com/>`__ account.
