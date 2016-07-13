@@ -7,18 +7,19 @@ MarkLogic.
 Features
 --------
 
--  easy to install
--  configurable selection of metrics
--  retrieve summary metrics on local cluster, hosts, servers & forests.
--  retrieve detail metrics on databases, forests, hosts, groups & servers.
--  proxy access NewRelic api
+-  Easy to install
+-  Configurable selection of metrics
+-  Retrieve summary metrics on local cluster, hosts, servers & forests.
+-  Retrieve detail metrics on databases, forests, hosts, groups & servers.
+-  Proxy access NewRelic api
+-  Sample monitoring dashboards available at new relic plugin central.
 
 Before you start
 ----------------
 
 Minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
 
-Minimally `MarkLogic v8.0-4 <http://developer.marklogic.com/products>`__ installed
+Minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
 and running.
 
 Require `NewRelic <http://www.newrelic.com/>`__ account.
@@ -29,15 +30,15 @@ Install, configure & run
 
 Install the plugin using any of the following methods.
 
-1) install direct from github
-
-    ``pip install https://github.com/marklogic/newrelic-plugin/archive/master.zip``
-
-2) install from pypi repository
+- install from pypi repository
 
     ``pip install newrelic-marklogic-plugin``
 
-3) download `release <../../releases>`__  (or clone) repository and run the following.
+- install direct from github
+
+    ``pip install https://github.com/marklogic/newrelic-plugin/archive/master.zip``
+
+- download `release <../../releases>`__  (or clone) repository and run the following.
 
     ``python setup.py install``
 
@@ -56,6 +57,9 @@ Start reporting metrics to NewRelic by running the following.
     ``newrelic_marklogic.py -c newrelic_marklogic.conf``
 
 Which will sample metrics every period of length duration as set within configuration.
+
+You are free to start plugin as a background task, run via a scheduler (ex. cron job) or any other
+environment specific approach.
 
 
 Usage
