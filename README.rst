@@ -8,18 +8,18 @@ Features
 --------
 
 -  Easy to install
--  Configurable selection of metrics
+-  Configurable selection of metrics to retrieve
 -  Retrieve summary metrics on local cluster, hosts, servers & forests.
 -  Retrieve detail metrics on databases, forests, hosts, groups & servers.
--  Proxy access NewRelic api
--  Sample monitoring dashboards available at new relic plugin central.
+-  Proxy access to NewRelic api
+-  Sample monitoring dashboards available at `NewRelic plugin central <https://newrelic.com/plugins>`__.
 
 Before you start
 ----------------
 
-Minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
+Require minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
 
-Minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
+Require minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
 and running.
 
 Require `NewRelic <http://www.newrelic.com/>`__ account.
@@ -47,7 +47,7 @@ Next step is to create and edit configuration file.
 
 1) Copy
    `etc/newrelic\_marklogic.conf.sample <etc/newrelic_marklogic.conf.sample>`__
-   and rename to ``newrelic_marklogic.conf``
+   and to ``newrelic_marklogic.conf``
 
 2) Edit ``newrelic_marklogic.conf`` ensuring correct MarkLogic
    connection details and NewRelic license key
@@ -56,17 +56,27 @@ Start reporting metrics to NewRelic by running the following.
 
     ``newrelic_marklogic.py -c newrelic_marklogic.conf``
 
-Which will sample metrics every period of length duration as set within configuration.
+Which samples metrics every period of length duration as set within configuration.
 
-You are free to start plugin as a background task, run via a scheduler (ex. cron job) or any other
-environment specific approach.
+It is recommended to initiate plugin as a background task, run via a scheduler (ex. cron job) or using any other
+approach appropriate for your environment.
 
+Running with -h flag will emit usage instructions for the running plugin.
+
+    ``newrelic_marklogic.py -h``
+
+::
+
+    usage: ./newrelic_marklogic.py [-h] [-c config file] [-l log file]
+
+    -h print usage instructions  (this message)
+    -c config file               (default: newrelic_marklogic.conf)
+    -l log file                  (default: newrelic_marklogic.log)
 
 Usage
 -----
 
-The configuration file drives most of the newrelic\_plugin features and
-is split into several sections.
+The configuration file drives all of the newrelic\_plugin features and is split into several sections.
 
 The 'marklogic' section contains connection details to MarkLogic server and Management REST API.
 
@@ -92,7 +102,7 @@ The 'marklogic' section contains connection details to MarkLogic server and Mana
     # Password to use when accessing MarkLogic management REST API.
     pass = admin
 
-The 'newrelic' section specifies the NewRelic license key. Optionally you may nominate a proxy for accessing NewRelic Plugin API.
+The 'newrelic' section specifies the NewRelic license key. Optionally you may nominate a proxy for accessing the NewRelic Plugin API.
 
 ::
 
@@ -105,7 +115,8 @@ The 'newrelic' section specifies the NewRelic license key. Optionally you may no
     http_proxy =
 
 The 'plugin' section defines sample period for updating NewRelic, as well as the logging level for emitting messages about plugin operation.
-There are a set of configurations for defining which statuses are captured by NewRelic.
+
+There are a set of configurations for defining which statuses are captured by NewRelic, summarised below.
 
 - summary_status (True|False): retrieve local cluster summary status.
 - databases (list of databases): retrieve database detailed status.
@@ -167,7 +178,12 @@ Please file `bug reports <../../issues>`__, `feature
 requests <../../issues>`__, and contribute with `pull
 requests <../../pulls>`__ through GitHub.
 
-License
--------
+Copyright & License
+-------------------
+
+newrelic-marklogic-plugin Copyright 2016 MarkLogic Corporation
+
+newrelic-marklogic-plugin is licensed under the Apache License, Version 2.0 (the "License"),
+a copy of the license is included within this package.
 
 `Apache License v2.0 <LICENSE>`__

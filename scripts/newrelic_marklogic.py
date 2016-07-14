@@ -31,6 +31,7 @@ pidfile = None
 logfile = None
 conffile = None
 
+# extract options
 for opt, val in opts:
     if opt == '-h':
         newrelic_marklogic_plugin.RunPlugin.usage()

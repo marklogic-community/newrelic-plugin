@@ -21,6 +21,10 @@
 """
 module responsible for retrieving MarkLogic statuses from Management REST API
 
+docs for Management REST API calls - http://docs.marklogic.com/REST/management
+
+NOTE - did not use marklogic-python api as that package is based on python 3.
+
 """
 
 import logging
@@ -43,7 +47,7 @@ class MarkLogicStatus:
 
     def get(self, resource=None, name=None, group=None):
 
-        # composite GET uri to Management REST API
+        # compose GET URI to MarkLogic Management REST API
         path = "/manage/v2"
         if resource:
             path += "/" + resource
@@ -53,7 +57,7 @@ class MarkLogicStatus:
         if group:
             path += "&group-id=" + group
 
-        # retrieve status
+        # retrieve Management REST API status
         try:
             return HTTPUtil.http_get(scheme=self.scheme,
                                      host=self.host,

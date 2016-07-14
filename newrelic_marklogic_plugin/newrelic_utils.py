@@ -21,6 +21,8 @@
 """
 module responsible for updating NewRelic
 
+docs for newrelic api - https://docs.newrelic.com/docs/apis
+
 """
 
 import json
@@ -44,20 +46,20 @@ class NewRelicUtility:
                         key=None, proxy=None):
         log.debug('update newrelic')
 
-        # construct agent
+        # construct newrelic agent
         agent = {'host': host or self.host, 'pid': pid or self.pid, 'version': version or self.version}
 
-        # construct components
+        # construct newrelic components
         components = []
         component = {'name': name, 'guid': guid, 'duration': duration, 'metrics': metrics}
         components.append(component)
 
-        # composite payload
+        # composite payload for sending to newrelic
         data = {'agent': agent, 'components': components}
         log.debug("payload:")
         log.debug(json.dumps(data))
 
-        # send to NewRelic API
+        # send to the NewRelic API, supplying correct headers and using proxy (if defined).
         try:
             return HTTPUtil.http_post(
                 scheme="https",
