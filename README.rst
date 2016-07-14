@@ -76,7 +76,7 @@ Running with -h flag will emit usage instructions for the running plugin.
 Usage
 -----
 
-The configuration file drives all of the newrelic\_plugin features and is split into several sections.
+The configuration file drives all of the newrelic-marklogic-plugin features and is split into several sections.
 
 The 'marklogic' section contains connection details to MarkLogic server and Management REST API.
 
