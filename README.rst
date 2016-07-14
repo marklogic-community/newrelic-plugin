@@ -61,7 +61,7 @@ Which samples metrics every period of length duration as set within configuratio
 It is recommended to initiate plugin as a background task, run via a scheduler (ex. cron job) or using any other
 approach appropriate for your environment.
 
-Running with -h flag will emit usage instructions for the running plugin.
+Running with -h flag will emit usage instructions for running plugin.
 
     ``newrelic_marklogic.py -h``
 
