@@ -31,10 +31,8 @@ def main():
         ],
         platforms='any',
         install_requires=[
-            'requests'
+            'requests>=2.10'
         ],
-        setup_requires=['pytest-runner'],
-        tests_require=['pytest'],
     )
 
 if __name__ == '__main__':

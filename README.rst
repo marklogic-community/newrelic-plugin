@@ -19,6 +19,8 @@ Before you start
 
 Require minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
 
+`Requests python package <https://pypi.python.org/pypi/requests>`__ v2.10 or greater.
+
 Require minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
 and running.
 
