@@ -24,17 +24,17 @@ from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-
+host= "node1"
 
 class HTTPUtilTests(unittest.TestCase):
     def testRest1(self):
-        response = HTTPUtil.http_get("http", "localhost", 8002, "/manage/v2?view=status", "admin", "admin", "public",
+        response = HTTPUtil.http_get("http", host, 8002, "/manage/v2?view=status", "admin", "admin", "public",
                                      "DIGEST")
         assert response
 
     def testRest2(self):
         response = HTTPUtil.http_get(scheme="http",
-                                     host="localhost",
+                                     host=host,
                                      port=8002,
                                      path="/manage/v2?view=status",
                                      user="admin",
@@ -56,7 +56,7 @@ class HTTPUtilTests(unittest.TestCase):
                                                'X-License-Key': 'e8cf9b3d7aaca22a8632c7e01a14f8e722519b8a'},
                                       payload={
                                           "agent": {
-                                              "host": "localhost",
+                                              "host": host,
                                               "pid": 1234,
                                               "version": "1.0.0"
                                           },

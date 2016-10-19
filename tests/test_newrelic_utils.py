@@ -23,11 +23,12 @@ from newrelic_marklogic_plugin.newrelic_utils import NewRelicUtility
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
+host= "node1"
 
 class NewRelicUtilsTests(unittest.TestCase):
     def testUpdate(self):
         response = NewRelicUtility.update_newrelic(self,
-                                                   host="localhost",
+                                                   host=host,
                                                    pid=1234,
                                                    version="0.0.1",
                                                    name="marklogic_unittest",
