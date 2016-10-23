@@ -33,7 +33,7 @@ import ConfigParser  # TBD- python 3.5 does not have this module
 import newrelic_utils
 from marklogic_status import MarkLogicStatus
 
-__version__ = '0.2.5'
+__version__ = '0.2.6'
 
 
 decl = {
@@ -67,6 +67,7 @@ class RunPlugin:
             self.ml_auth = config.get('marklogic', 'auth')
             self.nr_license_key = config.get('newrelic', 'key')
             self.nr_http_proxy = config.get('newrelic', 'http_proxy')
+            self.nr_https_proxy = config.get('newrelic', 'https_proxy')
             self.plugin_name = config.get('plugin', 'name')
             self.plugin_guid = config.get('plugin', 'guid')
             self.plugin_duration = config.getint('plugin', 'duration')
@@ -312,7 +313,8 @@ class RunPlugin:
                                                                          duration=self.plugin_duration,
                                                                          metrics=metrics,
                                                                          key=self.nr_license_key,
-                                                                         proxy=self.nr_http_proxy)
+                                                                         http_proxy=self.nr_http_proxy,
+                                                                         https_proxy=self.nr_https_proxy)
 
         if "error" in update_newrelic:
             log.error(update_newrelic["error"])
