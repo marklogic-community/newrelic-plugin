@@ -38,7 +38,7 @@ class HTTPUtil:
 
     @staticmethod
     def http_get(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                 headers={'Accept': 'application/json'}, format="json", proxy=None):
+                 headers={'Accept': 'application/json'}, format="json", http_proxy=None,https_proxy=None):
         log.debug("dereference http GET")
         try:
             if url:
@@ -55,7 +55,13 @@ class HTTPUtil:
                 auth = HTTPBasicAuth(user, passwd)
             else:
                 auth = None
-            response = requests.get(requrl, auth=auth, headers=headers)
+            proxies=None
+            if http_proxy or https_proxy:
+               proxies = {
+                    "http": http_proxy,
+                    "https": https_proxy
+                }
+            response = requests.get(requrl, auth=auth, headers=headers, proxies=proxies)
 
             if response.status_code == 200:
                 if format == "json":
@@ -80,7 +86,7 @@ class HTTPUtil:
 
     @staticmethod
     def http_post(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                  headers={'Accept': 'application/json'}, format="json", payload=None, proxy=None):
+                  headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None,https_proxy=None):
         log.debug("execute http post call")
         try:
             if url:
@@ -97,7 +103,10 @@ class HTTPUtil:
                 auth = HTTPBasicAuth(user, passwd)
             else:
                 auth = None
-            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxy)
+            proxies = {
+                "http": http_proxy,
+                "https": https_proxy}
+            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxies)
             if format == "json":
                 return response.json()
             else:

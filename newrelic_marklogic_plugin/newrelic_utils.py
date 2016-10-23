@@ -43,7 +43,7 @@ class NewRelicUtility:
 
     @staticmethod
     def update_newrelic(self, host=None, version=None, pid=None, name=None, guid=None, duration=None, metrics=None,
-                        key=None, proxy=None):
+                        key=None, http_proxy=None, https_proxy=None):
         log.debug('update newrelic')
 
         # construct newrelic agent
@@ -68,7 +68,8 @@ class NewRelicUtility:
                          'Content-Type': 'application/json',
                          'X-License-Key': key},
                 payload=data,
-                proxy=proxy)
+                http_proxy=http_proxy,
+                https_proxy=https_proxy)
         except Exception as e:
             log.error("Problem accessing NewRelic Plugin API")
             log.error(e)
