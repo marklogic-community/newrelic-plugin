@@ -66,7 +66,7 @@ class MarkLogicStatus:
                                      user=self.user,
                                      passwd=self.passwd,
                                      realm="public",
-                                     auth="DIGEST")
+                                     auth=self.auth)
         except Exception as e:
             log.error("Problem accessing MarkLogic Management API")
             log.error(e)

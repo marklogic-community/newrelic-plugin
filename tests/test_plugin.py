@@ -28,7 +28,7 @@ logging.basicConfig(level=logging.DEBUG)
 
 class PluginTests(unittest.TestCase):
     def testVersion(self):
-        assert newrelic_marklogic_plugin.__version__ == "0.2.6"
+        assert newrelic_marklogic_plugin.__version__ == "0.2.7"
 
     def testRunPlugin(self):
         self.held, sys.stdout = sys.stdout, StringIO()
