@@ -323,6 +323,7 @@ class RunPlugin:
 
     def getHostDetailStatus(self,status,hosts):
         metrics={}
+        log.debug("DEBUG: hosts: " + hosts)
         for host in re.split(" ", hosts):
             host_status = status.get(resource="hosts", name=host)
             host_detail = host_status["host-status"]["status-properties"]
@@ -365,11 +366,20 @@ class RunPlugin:
                         if re.match("license-key-options", hsd):
                             log.debug("ignoring " + hsd)
                         elif not units:
-                            metrics["Component/hosts/" + host + "/" + hsd] = host_detail["status-detail"][hsd]
+							#log.debug("Error no associated units: " + hsd)
+							#metrics["Component/hosts/" + host + "/" + hsd] = host_detail["status-detail"][hsd]
+							if type(host_status_detail[hsd]) == int :
+								log.debug("units INT: " +hsd)
+								metrics["Component/hosts/" + host + "/" + hsd + "[INT]"] =  host_status_detail[hsd]
+							elif type(host_status_detail[hsd]) == float :
+								log.debug("units FLOAT: " +hsd)
+								metrics["Component/hosts/" + host + "/" + hsd + "[FLOAT]"] =  host_status_detail[hsd]
+							else:
+								log.debug("No units: " + hsd)
                         else:
                             metrics["Component/hosts/" + host + "/" + hsd + "[" + units + "]"] = \
                             host_status_detail[hsd]["value"]
-            return metrics
+        return metrics
 
     def getForestDetailStatus(self,status,forests):
         metrics={}
@@ -389,7 +399,7 @@ class RunPlugin:
                 else:
                     metrics["Component/forests/" + forest + "/" + fd + "[" + units + "]"] = \
                         forest_detail[fd]["value"]
-            return metrics
+        return metrics
 
     def getGroupDetailStatus(self, status, groups):
         metrics = {}
@@ -409,7 +419,7 @@ class RunPlugin:
                     log.debug("ignoring group servers-status-summary")
                 else:
                     log.debug("ignoring group " + gd)
-            return metrics
+        return metrics
 
     def getServerDetailStatus(self,status,servers):
         metrics = {}
@@ -449,9 +459,9 @@ class RunPlugin:
                     else:
                         metrics["Component/servers/" + server + "/" + sd + "[" + units + "]"] = \
                             server_detail[sd]["value"]
-                return metrics
             else:
                 log.error("cannot retrieve " + server + " server status, check configuration")
+        return metrics
 
     @staticmethod
     def usage():
