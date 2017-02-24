@@ -183,6 +183,8 @@ There are a set of configurations for defining which statuses are captured by Ne
 Create pypi distribution
 ---------------------------------------
 
+To create an official distribution:
+
 1. bump version number
 
 2. create test distro
