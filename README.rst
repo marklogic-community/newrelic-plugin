@@ -183,14 +183,13 @@ There are a set of configurations for defining which statuses are captured by Ne
 Create pypi distribution
 ---------------------------------------
 
-To create an official distribution:
+To create an official distribution, first bump version number then test by
+creating distro on pypitest
 
-* bump version number
-
-* create test distro
 ``python setup.py register -r pypitest``
 
-* create pypi distro
+after verifying all is well you may generate distro on pypi:
+
 ``python setup.py register -r pypi``
 
 
