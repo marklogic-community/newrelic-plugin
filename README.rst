@@ -142,7 +142,7 @@ There are a set of configurations for defining which statuses are captured by Ne
     [plugin]
 
     # NewRelic plugin display name.
-    name = marklogic
+    name = myMarkLogicServer
 
     # Unique NewRelic plugin guid.
     guid = com.marklogic
