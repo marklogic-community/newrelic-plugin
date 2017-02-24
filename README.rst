@@ -184,10 +184,8 @@ Create pypi distribution
 ---------------------------------------
 
 1) bump version number
-
 2) create test distro
 ``python setup.py register -r pypitest``
-
 3) create pypi distro
 ``python setup.py register -r pypi``
 
