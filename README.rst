@@ -183,12 +183,12 @@ There are a set of configurations for defining which statuses are captured by Ne
 Create pypi distribution
 ---------------------------------------
 
-1) bump version number
+1. bump version number
 
-2) create test distro
+2. create test distro
 ``python setup.py register -r pypitest``
 
-3) create pypi distro
+3. create pypi distro
 ``python setup.py register -r pypi``
 
 
