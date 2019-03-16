@@ -13,7 +13,7 @@ def main():
         long_description=open(join(base_dir, 'README.rst'), encoding='utf-8').read(),
         version='0.2.8',
         packages=find_packages(),
-        url='http://github.com/marklogic/newrelic_marklogic',
+        url='https://github.com/marklogic-community/newrelic-plugin',
         license=open(join(base_dir, 'LICENSE'), encoding='utf-8').read(),
         author='James Fuller',
         author_email='jim.fuller@marklogic.com',
