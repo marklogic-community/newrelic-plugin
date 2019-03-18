@@ -169,8 +169,11 @@ class RunPlugin:
                             "units"] + "]"] = \
                             host_summary[metric]["rate-detail"][lr]["value"]
                 else:
-                    metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = \
-                        host_summary[metric]["value"]
+                    val = host_summary[metric]
+                    if type(val) is dict:
+                        metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = val["value"]
+                    else:
+                        metrics["Component/hosts/" + metric + "[quantity]"] = val
 
         # retrieve forest summary status
         if self.plugin_forests_summary_status:
@@ -199,8 +202,12 @@ class RunPlugin:
                         metrics["Component/forests/rate/detail/" + rd + "[" + rate_details[rd]["units"] + "]"] = \
                             rate_details[rd]["value"]
                 else:
-                    metrics["Component/forests/" + metric + "[" + forest_summary[metric]["units"] + "]"] = \
-                        forest_summary[metric]["value"]
+                    val = forest_summary[metric]
+                    if type(val) is dict:
+                        metrics["Component/forests/" + metric + "[" + forest_summary[metric]["units"] + "]"] = \
+                            val["value"]
+                    else:
+                        metrics["Component/forests/" + metric + "[quantity]"] = val
 
         # retrieve host summary status
         if self.plugin_hosts_summary_status:
@@ -225,8 +232,11 @@ class RunPlugin:
                             "units"] + "]"] = \
                             host_summary[metric]["rate-detail"][lr]["value"]
                 else:
-                    metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = \
-                        host_summary[metric]["value"]
+                    val = host_summary[metric]
+                    if type(val) is dict:
+                        metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = val["value"]
+                    else:
+                        metrics["Component/hosts/" + metric + "[quantity]"] = val
 
         # retrieve server summary status
         if self.plugin_servers_summary_status:
