@@ -1,4 +1,4 @@
-from __future__ import unicode_literals,print_function
+from __future__ import unicode_literals, print_function
 from distutils.core import setup
 from codecs import open
 from os.path import dirname, join
@@ -26,7 +26,7 @@ def main():
                      'Operating System :: OS Independent',
                      'Topic :: Software Development :: Libraries :: Python Modules'
                      ],
-        scripts = [
+        scripts=[
             'scripts/newrelic_marklogic.py'
         ],
         platforms='any',

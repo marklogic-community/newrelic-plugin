@@ -35,7 +35,7 @@ class PluginTests(unittest.TestCase):
         nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',
                                                    confFile='etc/newrelic_marklogic.conf.sample')
         nrml.statusUpdate()
-        self.assertEqual(sys.stdout.getvalue().strip(),'')
+        self.assertEqual(sys.stdout.getvalue().strip(), '')
 
     def testConfigFile(self):
         nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',

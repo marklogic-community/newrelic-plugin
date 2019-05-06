@@ -24,7 +24,7 @@ from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-host= "node1"
+host = "node1"
 
 class HTTPUtilTests(unittest.TestCase):
     def testRest1(self):
