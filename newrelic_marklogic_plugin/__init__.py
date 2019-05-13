@@ -290,7 +290,7 @@ class RunPlugin:
                                 metrics["Component/databases/" + db + "/cache/" + dcd + "[" + cache_units + "]"] = \
                                     database_cache_details[dcd]["value"]
                     elif re.match(
-                            "local-disk-failover|database-replication-status|flexible-replication-enabled|cpf-enabled",
+                            "local-disk-failover|database-replication-status|flexible-replication-enabled|cpf-enabled|shared-disk-failover",
                             dd):
                         log.debug("ignoring " + dd)
                     elif not units:
