@@ -75,10 +75,12 @@ class HTTPUtil:
                 sys.exit(1)
             return
 
-        except requests.exceptions.Timeout:
-            log.error("timeout error")
-        except requests.exceptions.TooManyRedirects:
-            log.error("too many redirects")
+        except (requests.ConnectTimeout,
+                requests.HTTPError,
+                requests.ReadTimeout,
+                requests.Timeout,
+                requests.ConnectionError) as exception:
+            log.error(exception)
         except requests.exceptions.RequestException as e:
             log.error(e)
             sys.exit(1)
@@ -112,10 +114,12 @@ class HTTPUtil:
             else:
                 return response.headers
 
-        except requests.exceptions.Timeout:
-            log.error("timeout error")
-        except requests.exceptions.TooManyRedirects:
-            log.error("too many redirects")
+        except (requests.ConnectTimeout,
+                requests.HTTPError,
+                requests.ReadTimeout,
+                requests.Timeout,
+                requests.ConnectionError) as exception:
+            log.error(exception)
         except requests.exceptions.RequestException as e:
             log.error(e)
             sys.exit(1)
