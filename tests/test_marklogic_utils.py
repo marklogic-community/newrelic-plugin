@@ -19,17 +19,17 @@
 
 # working directory=tests
 import unittest
-import logging, sys
+import logging
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
 log = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-host= "node1"
+host = "node1"
 
 
 class MarkLogicUtilsTests(unittest.TestCase):
     def testRest(self):
-        status = MarkLogicStatus(scheme="http",user="admin",passwd="admin",host=host,port=8002,auth="DIGEST")
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=host, port=8002, auth="DIGEST")
         response = status.get()
         log.debug(response)
 

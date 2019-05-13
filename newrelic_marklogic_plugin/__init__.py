@@ -115,7 +115,7 @@ class RunPlugin:
         log.debug("retrieve statuses and update newrelic")
         status = MarkLogicStatus(scheme=self.ml_scheme, user=self.ml_user, passwd=self.ml_pass, auth=self.ml_auth,
                                  host=self.ml_host, port=self.ml_port
-                                 )
+                                )
         metrics = {}
 
         # retrieve summary status
@@ -252,7 +252,7 @@ class RunPlugin:
                 database_status = status.get(resource="databases", name=db)
                 database_detail = database_status["database-status"]["status-properties"]
                 for dd in database_detail:
-                    units=None
+                    units = None
                     if "units" in database_detail[dd]:
                         units = database_detail[dd]["units"]
                     if dd == "load-properties":
@@ -279,7 +279,7 @@ class RunPlugin:
                                     database_rate_details[drd]["value"]
                     elif dd == "cache-properties":
                         database_cache_details = \
-                        database_status["database-status"]["status-properties"]["cache-properties"]
+                            database_status["database-status"]["status-properties"]["cache-properties"]
                         for dcd in database_cache_details:
                             cache_units = None
                             if "units" in database_cache_details[dcd]:
@@ -290,7 +290,7 @@ class RunPlugin:
                                 metrics["Component/databases/" + db + "/cache/" + dcd + "[" + cache_units + "]"] = \
                                     database_cache_details[dcd]["value"]
                     elif re.match(
-                            "local-disk-failover|database-replication-status|flexible-replication-enabled|cpf-enabled",
+                            "local-disk-failover|database-replication-status|flexible-replication-enabled|cpf-enabled|shared-disk-failover",
                             dd):
                         log.debug("ignoring " + dd)
                     elif not units:
@@ -301,14 +301,14 @@ class RunPlugin:
 
         # retrieve specific host detail status
         if self.plugin_hosts:
-            metrics.update(self.getHostDetailStatus(status,self.plugin_hosts))
+            metrics.update(self.getHostDetailStatus(status, self.plugin_hosts))
         # retrieve specific forest detail status
         if self.plugin_forests:
-            metrics.update(self.getForestDetailStatus(status,self.plugin_forests))
+            metrics.update(self.getForestDetailStatus(status, self.plugin_forests))
 
         # retrieve specific group detail status
         if self.plugin_groups:
-            metrics.update(self.getGroupDetailStatus(status,self.plugin_groups))
+            metrics.update(self.getGroupDetailStatus(status, self.plugin_groups))
 
         # retrieve specific server detail status
         if self.plugin_servers:
@@ -331,8 +331,8 @@ class RunPlugin:
         else:
             log.debug("update status: " + json.dumps(update_newrelic))
 
-    def getHostDetailStatus(self,status,hosts):
-        metrics={}
+    def getHostDetailStatus(self, status, hosts):
+        metrics = {}
         log.debug("DEBUG: hosts: " + hosts)
         for host in re.split(" ", hosts):
             host_status = status.get(resource="hosts", name=host)
@@ -376,23 +376,23 @@ class RunPlugin:
                         if re.match("license-key-options", hsd):
                             log.debug("ignoring " + hsd)
                         elif not units:
-							#log.debug("Error no associated units: " + hsd)
-							#metrics["Component/hosts/" + host + "/" + hsd] = host_detail["status-detail"][hsd]
-							if type(host_status_detail[hsd]) == int :
-								log.debug("units INT: " +hsd)
-								metrics["Component/hosts/" + host + "/" + hsd + "[INT]"] =  host_status_detail[hsd]
-							elif type(host_status_detail[hsd]) == float :
-								log.debug("units FLOAT: " +hsd)
-								metrics["Component/hosts/" + host + "/" + hsd + "[FLOAT]"] =  host_status_detail[hsd]
-							else:
-								log.debug("No units: " + hsd)
+                            #log.debug("Error no associated units: " + hsd)
+                            #metrics["Component/hosts/" + host + "/" + hsd] = host_detail["status-detail"][hsd]
+                            if type(host_status_detail[hsd]) == int:
+                                log.debug("units INT: " + hsd)
+                                metrics["Component/hosts/" + host + "/" + hsd + "[INT]"] = host_status_detail[hsd]
+                            elif type(host_status_detail[hsd]) == float:
+                                log.debug("units FLOAT: " + hsd)
+                                metrics["Component/hosts/" + host + "/" + hsd + "[FLOAT]"] = host_status_detail[hsd]
+                            else:
+                                log.debug("No units: " + hsd)
                         else:
                             metrics["Component/hosts/" + host + "/" + hsd + "[" + units + "]"] = \
-                            host_status_detail[hsd]["value"]
+                                host_status_detail[hsd]["value"]
         return metrics
 
-    def getForestDetailStatus(self,status,forests):
-        metrics={}
+    def getForestDetailStatus(self, status, forests):
+        metrics = {}
         for forest in re.split(" ", forests):
             forest_status = status.get(resource="forests", name=forest)
             forest_detail = forest_status["forest-status"]["status-properties"]
@@ -431,7 +431,7 @@ class RunPlugin:
                     log.debug("ignoring group " + gd)
         return metrics
 
-    def getServerDetailStatus(self,status,servers):
+    def getServerDetailStatus(self, status, servers):
         metrics = {}
         for servergroup in re.split(" ", servers):
             s = servergroup.split(":")
@@ -441,7 +441,7 @@ class RunPlugin:
                 server_status = status.get(resource="servers", name=server, group=group)
                 server_detail = server_status["server-status"]["status-properties"]
                 for sd in server_detail:
-                    units=None
+                    units = None
                     try:
                         if "units" in server_detail[sd]:
                             units = server_detail[sd]["units"]
