@@ -29,7 +29,7 @@ Require `NewRelic <http://www.newrelic.com/>`__ account.
 Docs
 ----
 
-`newrelic-marklogic-plugin docs on github <https://github.com/marklogic/newrelic-plugin>`__
+`newrelic-marklogic-plugin docs on github <https://github.com/marklogic-community/newrelic-plugin>`__
 
 `newrelic-marklogic-plugin docs on pypi <https://pypi.python.org/pypi/newrelic-marklogic-plugin>`__
 
@@ -45,9 +45,9 @@ Install the plugin using any of the following methods.
 
 - install direct from github
 
-    ``pip install https://github.com/marklogic/newrelic-plugin/archive/master.zip``
+    ``pip install https://github.com/marklogic-community/newrelic-plugin/archive/master.zip``
 
-- download `release <https://github.com/marklogic/newrelic-plugin/releases>`__  (or clone) repository and run the following.
+- download `release <https://github.com/marklogic-community/newrelic-plugin/releases>`__  (or clone) repository and run the following.
 
     ``python setup.py install``
 
@@ -55,7 +55,7 @@ Install the plugin using any of the following methods.
 Next step is to create and edit configuration file.
 
 1) Copy
-   `etc/newrelic\_marklogic.conf.sample <https://github.com/marklogic/newrelic-plugin/blob/master/etc/newrelic_marklogic.conf.sample>`__
+   `etc/newrelic\_marklogic.conf.sample <https://github.com/marklogic-community/newrelic-plugin/blob/master/etc/newrelic_marklogic.conf.sample>`__
    and to ``newrelic_marklogic.conf``
 
 2) Edit ``newrelic_marklogic.conf`` ensuring correct MarkLogic
@@ -196,9 +196,9 @@ after verifying all is well you may generate distro on pypi:
 Issues, feature requests & contributing
 ---------------------------------------
 
-Please file `bug reports <https://github.com/marklogic/newrelic-plugin/issues>`__, `feature
-requests <https://github.com/marklogic/newrelic-plugin/issues>`__, and contribute with `pull
-requests <https://github.com/marklogic/newrelic-plugin/pulls>`__ through GitHub.
+Please file `bug reports <https://github.com/marklogic-community/newrelic-plugin/issues>`__, `feature
+requests <https://github.com/marklogic-community/newrelic-plugin/issues>`__, and contribute with `pull
+requests <https://github.com/marklogic-community/newrelic-plugin/pulls>`__ through GitHub.
 
 Copyright & License
 -------------------
@@ -208,4 +208,4 @@ newrelic-marklogic-plugin Copyright 2019 MarkLogic Corporation
 newrelic-marklogic-plugin is licensed under the Apache License, Version 2.0 (the "License"),
 a copy of the license is included within this package.
 
-`Apache License v2.0 <https://github.com/marklogic/newrelic-plugin/blob/master/LICENSE>`__
+`Apache License v2.0 <https://github.com/marklogic-community/newrelic-plugin/blob/master/LICENSE>`__
