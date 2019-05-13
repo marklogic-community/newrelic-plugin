@@ -203,7 +203,7 @@ requests <https://github.com/marklogic/newrelic-plugin/pulls>`__ through GitHub.
 Copyright & License
 -------------------
 
-newrelic-marklogic-plugin Copyright 2016 MarkLogic Corporation
+newrelic-marklogic-plugin Copyright 2019 MarkLogic Corporation
 
 newrelic-marklogic-plugin is licensed under the Apache License, Version 2.0 (the "License"),
 a copy of the license is included within this package.
