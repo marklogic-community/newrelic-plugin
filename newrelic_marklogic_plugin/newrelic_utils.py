@@ -31,12 +31,12 @@ import __init__
 
 from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class NewRelicUtility:
     def __init__(self, host='localhost', pid='default', version=__init__.__version__):
-        log.debug('init NewRelicUtility')
+        LOG.debug('init NewRelicUtility')
         self.host = host
         self.pid = pid
         self.version = version
@@ -44,7 +44,7 @@ class NewRelicUtility:
     @staticmethod
     def update_newrelic(self, host=None, version=None, pid=None, name=None, guid=None, duration=None, metrics=None,
                         key=None, http_proxy=None, https_proxy=None):
-        log.debug('update newrelic')
+        LOG.debug('update newrelic')
 
         # construct newrelic agent
         agent = {'host': host or self.host, 'pid': pid or self.pid, 'version': version or self.version}
@@ -56,8 +56,8 @@ class NewRelicUtility:
 
         # composite payload for sending to newrelic
         data = {'agent': agent, 'components': components}
-        log.debug("payload:")
-        log.debug(json.dumps(data))
+        LOG.debug("payload:")
+        LOG.debug(json.dumps(data))
 
         # send to the NewRelic API, supplying correct headers and using proxy (if defined).
         try:
@@ -71,6 +71,6 @@ class NewRelicUtility:
                 http_proxy=http_proxy,
                 https_proxy=https_proxy)
         except Exception as e:
-            log.error("Problem accessing NewRelic Plugin API")
-            log.error(e)
+            LOG.error("Problem accessing NewRelic Plugin API")
+            LOG.error(e)
             pass

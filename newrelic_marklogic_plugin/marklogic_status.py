@@ -30,7 +30,7 @@ NOTE - did not use marklogic-python api as that package is based on python 3.
 import logging
 from http_utils import HTTPUtil
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class MarkLogicStatus:
@@ -68,6 +68,6 @@ class MarkLogicStatus:
                                      realm="public",
                                      auth=self.auth)
         except Exception as e:
-            log.error("Problem accessing MarkLogic Management API")
-            log.error(e)
+            LOG.error("Problem accessing MarkLogic Management API")
+            LOG.error(e)
             pass

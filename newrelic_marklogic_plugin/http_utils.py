@@ -28,7 +28,7 @@ import requests
 import sys
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
 class HTTPUtil:
@@ -39,7 +39,7 @@ class HTTPUtil:
     @staticmethod
     def http_get(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
                  headers={'Accept': 'application/json'}, format="json", http_proxy=None, https_proxy=None):
-        log.debug("dereference http GET")
+        LOG.debug("dereference http GET")
         try:
             if url:
                 requrl = url
@@ -47,7 +47,7 @@ class HTTPUtil:
                 requrl = scheme + "://" + host + ":"
                 requrl += repr(port)
                 requrl += path
-                log.debug(requrl)
+                LOG.debug(requrl)
 
             if auth == "DIGEST":
                 auth = HTTPDigestAuth(user, passwd)
@@ -67,11 +67,11 @@ class HTTPUtil:
                 if format == "json":
                     return response.json()
                 else:
-                    log.error("Must dereference json representation.")
+                    LOG.error("Must dereference json representation.")
                     # return a response to aid testing http GET
                     return response
             else:
-                log.error("HTTP Request returned " + str(response.status_code) + " when accessing "+ requrl + " , check configuration.")
+                LOG.error("HTTP Request returned " + str(response.status_code) + " when accessing "+ requrl + " , check configuration.")
                 sys.exit(1)
             return
 
@@ -89,7 +89,7 @@ class HTTPUtil:
     @staticmethod
     def http_post(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
                   headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None, https_proxy=None):
-        log.debug("execute http post call")
+        LOG.debug("execute http post call")
         try:
             if url:
                 requrl = url
@@ -97,7 +97,7 @@ class HTTPUtil:
                 requrl = scheme + "://" + host + ":"
                 requrl += repr(port)
                 requrl += path
-                log.debug(requrl)
+                LOG.debug(requrl)
 
             if auth == "DIGEST":
                 auth = HTTPDigestAuth(user, passwd)
@@ -119,8 +119,8 @@ class HTTPUtil:
                 requests.ReadTimeout,
                 requests.Timeout,
                 requests.ConnectionError) as exception:
-            log.error(exception)
+            LOG.error(exception)
         except requests.exceptions.RequestException as e:
-            log.error(e)
+            LOG.error(e)
             sys.exit(1)
         return
