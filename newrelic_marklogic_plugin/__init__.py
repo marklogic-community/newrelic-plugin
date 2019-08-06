@@ -33,7 +33,7 @@ import ConfigParser  # TBD- python 3.5 does not have this module
 import newrelic_utils
 from marklogic_status import MarkLogicStatus
 
-__version__ = '0.2.8'
+__version__ = '0.2.9'
 
 
 DECL = {
@@ -171,7 +171,8 @@ class RunPlugin:
         else:
             LOG.debug("update status: %s", json.dumps(update_newrelic))
 
-    def get_summary_status(self, status):
+    @classmethod
+    def get_summary_status(cls, status):
         """
         Retrieve the cluster status and return a dict with summary metrics
         :param status:
@@ -186,10 +187,11 @@ class RunPlugin:
             prefix = "Component/" + status_relation["typeref"] + "/"
             summary_obj = status_relation[relation + "-summary"]
             for key in summary_obj:
-                self.process_metric(metrics, prefix, summary_obj, key)
+                cls.process_metric(metrics, prefix, summary_obj, key)
         return metrics
 
-    def get_resource_summary_status(self, status, resource):
+    @classmethod
+    def get_resource_summary_status(cls, status, resource):
         """
         Retrieve the summary status for the given resource and return a dict with the parsed metrics
         :param status:
@@ -205,7 +207,7 @@ class RunPlugin:
             if status_key.endswith("-status-list"):
                 properties = resource_status[status_key]["status-list-summary"]
                 for key in properties:
-                    self.process_metric(metrics, prefix, properties, key)
+                    cls.process_metric(metrics, prefix, properties, key)
         return metrics
 
     def get_database_detail_status(self, status, databases):
@@ -220,7 +222,8 @@ class RunPlugin:
     def get_group_detail_status(self, status, groups):
         return self.get_resource_detail_status(status, "groups", groups)
 
-    def get_server_detail_status(self, status, servers):
+    @classmethod
+    def get_server_detail_status(cls, status, servers):
         """
         Retrieve the status for each of the space separated server:group (colon separated) combinations and return a
         dict with the parsed metrics
@@ -237,12 +240,13 @@ class RunPlugin:
                 LOG.debug("Requesting server details for name: " + server + " group: " + group)
                 server_status = status.get(resource="servers", name=server, group=group)
                 prefix = "Component/servers/" + server + "/"
-                metrics.update(self.process_status(prefix, server_status))
+                metrics.update(cls.process_status(prefix, server_status))
             else:
                 LOG.error("cannot retrieve %s server status, check configuration", server)
         return metrics
 
-    def get_resource_detail_status(self, status, resource_type, resource_names):
+    @classmethod
+    def get_resource_detail_status(cls, status, resource_type, resource_names):
         """
         Retrieve the resource for each of the (space separated) resource names and return a dict with the parsed metrics
         :param status:
@@ -255,12 +259,13 @@ class RunPlugin:
             LOG.debug("Retrieving " + resource_type + ": " + name)
             resource_status = status.get(resource=resource_type, name=name)
             prefix = "Component/" + resource_type + "/" + name + "/"
-            metrics.update(self.process_status(prefix, resource_status))
+            metrics.update(cls.process_status(prefix, resource_status))
         return metrics
 
-    def process_status(self, prefix, status_obj):
+    @classmethod
+    def process_status(cls, prefix, status_obj):
         """
-        Process the status response and return a dict with each of the status-properties
+        Process the status response and return a dict with each of the status-properties children
         :param prefix:
         :param status_obj:
         :return:
@@ -268,9 +273,11 @@ class RunPlugin:
         metrics = {}
         for status_key in status_obj:
             if status_key.endswith("-status"):
-                properties = status_obj[status_key]["status-properties"]
-                for key in properties:
-                    self.process_metric(metrics, prefix, properties, key)
+                status = status_obj[status_key]
+                if isinstance(status, dict):
+                    properties = status["status-properties"]
+                    for key in properties:
+                        cls.process_metric(metrics, prefix, properties, key)
         return metrics
 
     @staticmethod
@@ -289,7 +296,8 @@ class RunPlugin:
                 label += "[" + units + "]"
         return label
 
-    def set_metric(self, metrics, prefix, obj, key):
+    @classmethod
+    def set_metric(cls, metrics, prefix, obj, key):
         """
         Add a metric for the property specified
         :param metrics:
@@ -302,9 +310,10 @@ class RunPlugin:
         if isinstance(value, dict):
             value = value.get("value")
         LOG.debug(str(key) + "=" + str(value))
-        metrics[prefix + self.label_units(obj, key)] = value
+        metrics[prefix + cls.label_units(obj, key)] = value
 
-    def process_metric(self, metrics, prefix, obj, prop,
+    @classmethod
+    def process_metric(cls, metrics, prefix, obj, prop,
                        ignore_pattern="backup-job|.*-cache-partition$|database-replication-status|error-handler" \
                                       "|license-key-option|local-disk-failover|output-encoding|root$" \
                                       "|shared-disk-failover|stand$|url-rewriter"):
@@ -327,24 +336,24 @@ class RunPlugin:
                     metric = prop[:prop.index("-status-summary")]
                     metric_prefix = prefix + metric + "/"
                     for key in value:
-                        self.process_metric(metrics, metric_prefix, value, key)
+                        cls.process_metric(metrics, metric_prefix, value, key)
                 elif prop.endswith("-properties"):
                     metric = prop[:prop.index("-properties")]
                     metric_prefix = prefix + metric + "/"
                     for key in value:
-                        self.process_metric(metrics, metric_prefix, value, key)
+                        cls.process_metric(metrics, metric_prefix, value, key)
                 elif prop.endswith("-detail"):
                     property_prefix = prefix
                     if prop != "status-detail":
                         property_prefix += "detail/"
                     for detail in value:
-                        self.process_metric(metrics, property_prefix, value, detail)
+                        cls.process_metric(metrics, property_prefix, value, detail)
                 elif value.get("units", "") == "bool":
                     LOG.debug("ignoring: %s", prop)
                 else:
-                    self.set_metric(metrics, prefix, obj, prop)
+                    cls.set_metric(metrics, prefix, obj, prop)
             else:
-                self.set_metric(metrics, prefix, obj, prop)
+                cls.set_metric(metrics, prefix, obj, prop)
 
     @staticmethod
     def singular(value):
