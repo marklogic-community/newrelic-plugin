@@ -22,15 +22,21 @@ import unittest
 import logging
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
-log = logging.getLogger()
+LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-host = "node1"
+HOST = "node1"
 
 
 class MarkLogicUtilsTests(unittest.TestCase):
-    def testRest(self):
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=host, port=8002, auth="DIGEST")
+    def test_rest(self):
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST")
         response = status.get()
-        log.debug(response)
-
-        assert response
+        LOG.debug(response)
+        self.assertEqual(status.scheme, "http")
+        self.assertEqual(status.user, "admin")
+        self.assertEqual(status.passwd, "admin")
+        self.assertEqual(status.host, HOST)
+        self.assertEqual(status.port, 8002)
+        self.assertEqual(status.auth, "DIGEST")
+        self.assertTrue(isinstance(response, dict))
+        self.assertIsNotNone(response["local-cluster-status"])

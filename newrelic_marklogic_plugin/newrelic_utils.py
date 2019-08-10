@@ -27,15 +27,17 @@ docs for newrelic api - https://docs.newrelic.com/docs/apis
 
 import json
 import logging
-import __init__
-
+import newrelic_marklogic_plugin.__init__
 from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 LOG = logging.getLogger(__name__)
 
 
-class NewRelicUtility:
-    def __init__(self, host='localhost', pid='default', version=__init__.__version__):
+class NewRelicUtility(object):
+    """
+    Upload metrics to New Relic
+    """
+    def __init__(self, host='localhost', pid='default', version=newrelic_marklogic_plugin.__init__.__version__):
         LOG.debug('init NewRelicUtility')
         self.host = host
         self.pid = pid
@@ -70,7 +72,6 @@ class NewRelicUtility:
                 payload=data,
                 http_proxy=http_proxy,
                 https_proxy=https_proxy)
-        except Exception as e:
+        except Exception as exception:
             LOG.error("Problem accessing NewRelic Plugin API")
-            LOG.error(e)
-            pass
+            LOG.error(exception)
