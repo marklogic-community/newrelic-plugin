@@ -28,12 +28,15 @@ NOTE - did not use marklogic-python api as that package is based on python 3.
 """
 
 import logging
-from http_utils import HTTPUtil
+from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 LOG = logging.getLogger(__name__)
 
 
-class MarkLogicStatus:
+class MarkLogicStatus(object):
+    """
+    Construct a MarkLogic Manage API URL and retrieve the payload
+    """
     scheme = "http"
 
     def __init__(self, scheme=None, url=None, user=None, passwd=None, port=None, host=None, auth=None):
@@ -46,8 +49,13 @@ class MarkLogicStatus:
         self.auth = auth
 
     def get(self, resource=None, name=None, group=None):
-
-        # compose GET URI to MarkLogic Management REST API
+        """
+        compose GET URI to MarkLogic Management REST API
+        :param resource:
+        :param name:
+        :param group:
+        :return:
+        """
         path = "/manage/v2"
         if resource:
             path += "/" + resource
@@ -67,7 +75,6 @@ class MarkLogicStatus:
                                      passwd=self.passwd,
                                      realm="public",
                                      auth=self.auth)
-        except Exception as e:
+        except Exception as exception:
             LOG.error("Problem accessing MarkLogic Management API")
-            LOG.error(e)
-            pass
+            LOG.error(exception)
