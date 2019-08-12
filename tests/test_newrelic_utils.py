@@ -19,22 +19,28 @@
 
 import unittest
 import logging
+import newrelic_marklogic_plugin
 from newrelic_marklogic_plugin.newrelic_utils import NewRelicUtility
 
-log = logging.getLogger()
+LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-host = "node1"
+HOST = "node1"
 
 class NewRelicUtilsTests(unittest.TestCase):
-    def testUpdate(self):
-        response = NewRelicUtility.update_newrelic(self,
-                                                   host=host,
-                                                   pid=1234,
-                                                   version="0.0.1",
-                                                   name="marklogic_unittest",
-                                                   guid="com.marklogic",
-                                                   duration=60,
-                                                   metrics={"Component/MarkLogic[UnitTest]": 100},
-                                                   key="e8cf9b3d7aaca22a8632c7e01a14f8e722519b8a")
-        log.debug(response)
+    def test_init(self):
+        utility = NewRelicUtility()
+        self.assertEqual(utility.host, "localhost")
+        self.assertEqual(utility.pid, "default")
+        self.assertEqual(utility.version, newrelic_marklogic_plugin.__version__)
+
+    def test_update(self):
+        response = NewRelicUtility().update_newrelic(host=HOST,
+                                                     pid=1234,
+                                                     version="0.0.1",
+                                                     name="marklogic_unittest",
+                                                     guid="com.marklogic",
+                                                     duration=60,
+                                                     metrics={"Component/MarkLogic[UnitTest]": 100},
+                                                     key="e8cf9b3d7aaca22a8632c7e01a14f8e722519b8a")
+        LOG.debug(response)
         assert response
