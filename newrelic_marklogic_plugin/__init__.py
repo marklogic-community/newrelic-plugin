@@ -27,7 +27,11 @@ import re
 import sys
 import time
 import logging
-import ConfigParser  # TBD- python 3.5 does not have this module
+try:
+    import configparser
+except:
+    # Python2
+    import ConfigParser as configparser
 
 import newrelic_marklogic_plugin.newrelic_utils
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
@@ -52,7 +56,7 @@ class RunPlugin(object):
         self.confFile = confFile or DECL['confFile']
         try:
             LOG.debug('parse config')
-            config = ConfigParser.ConfigParser()
+            config = configparser.ConfigParser()
             config.read(self.confFile)
 
             self.ml_host = config.get('marklogic', 'host')

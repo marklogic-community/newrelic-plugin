@@ -19,7 +19,12 @@
 
 import unittest
 import logging, sys
-from StringIO import StringIO
+try:
+    from StringIO import StringIO
+except ImportError:
+    # Python2
+    from io import StringIO
+
 import newrelic_marklogic_plugin
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
@@ -98,18 +103,18 @@ class PluginTests(unittest.TestCase):
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "bar-detail")
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "status-detail")
 
-        self.assertFalse(metrics.has_key("Component/test/root"))
-        self.assertFalse(metrics.has_key("Component/test/enabled"))
+        self.assertTrue("Component/test/root" not in metrics)
+        self.assertTrue("Component/test/enabled" not in metrics)
         self.assertEqual(metrics.get("Component/test/hosts/foo"), 1)
         self.assertEqual(metrics.get("Component/test/hosts/memory-process-rss"), 10)
         self.assertEqual(metrics.get("Component/test/foo/bar[quantity]"), 22)
         self.assertEqual(metrics.get("Component/test/detail/baz[quantity]"), 33)
         self.assertEqual(metrics.get("Component/test/bat[quantity]"), 44)
-        self.assertFalse(metrics.has_key("Component/test/detail/bat[quantity]"))
+        self.assertTrue("Component/test/detail/bat[quantity]" not in metrics)
 
         # custom exclude pattern can be used
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "xyz", "xyz")
-        self.assertFalse(metrics.has_key("Component/test/xyz"))
+        self.assertTrue("Component/test/xyz" not in metrics)
         # when not applied, the field is added
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "xyz")
         self.assertEqual(metrics.get("Component/test/xyz"), 99)
