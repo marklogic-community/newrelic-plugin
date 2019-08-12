@@ -3,6 +3,7 @@ from distutils.core import setup
 from codecs import open
 from os.path import dirname, join
 from setuptools import setup, find_packages
+import newrelic_marklogic_plugin
 
 
 def main():
@@ -12,7 +13,7 @@ def main():
         name='newrelic_marklogic_plugin',
         description='NewRelic plugin for monitoring MarkLogic.',
         long_description=open(join(base_dir, 'README.rst'), encoding='utf-8').read(),
-        version='0.2.9',
+        version=newrelic_marklogic_plugin.__version__,
         packages=find_packages(),
         url='https://github.com/marklogic-community/newrelic-plugin',
         license=open(join(base_dir, 'LICENSE'), encoding='utf-8').read(),
