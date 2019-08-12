@@ -23,19 +23,19 @@ from StringIO import StringIO
 import newrelic_marklogic_plugin
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
-log = logging.getLogger()
+LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
 
 
 class PluginTests(unittest.TestCase):
     nrml = newrelic_marklogic_plugin.RunPlugin(logFile='newrelic_marklogic_plugin.log',
                                                confFile='etc/newrelic_marklogic.conf.sample')
+
     def test_version(self):
         assert newrelic_marklogic_plugin.__version__ == "0.2.9"
 
     def test_RunPlugin(self):
         self.held, sys.stdout = sys.stdout, StringIO()
-
         self.nrml.statusUpdate()
         self.assertEqual(sys.stdout.getvalue().strip(), '')
 
@@ -84,19 +84,28 @@ class PluginTests(unittest.TestCase):
             "root": "this value should be ignored",
             "enabled" : {"units": "bool", "value": True},
             "hosts-status-summary" : {"foo": 1, "memory-process-rss": 10},
+            "foo-properties": {"bar": {"units": "quantity", "value": 22}},
+            "bar-detail": {"baz": {"units": "quantity", "value": 33}},
+            "status-detail": {"bat": {"units": "quantity", "value": 44}},
             "memory-process-rss": 35,
             "xyz": 99
         }
-        # TODO: add coverage for "*-properties" and "*-detail"
+
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "root")
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "enabled")
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "hosts-status-summary")
-        newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "hosts-status-summary")
+        newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "foo-properties")
+        newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "bar-detail")
+        newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "status-detail")
 
         self.assertFalse(metrics.has_key("Component/test/root"))
         self.assertFalse(metrics.has_key("Component/test/enabled"))
         self.assertEqual(metrics.get("Component/test/hosts/foo"), 1)
         self.assertEqual(metrics.get("Component/test/hosts/memory-process-rss"), 10)
+        self.assertEqual(metrics.get("Component/test/foo/bar[quantity]"), 22)
+        self.assertEqual(metrics.get("Component/test/detail/baz[quantity]"), 33)
+        self.assertEqual(metrics.get("Component/test/bat[quantity]"), 44)
+        self.assertFalse(metrics.has_key("Component/test/detail/bat[quantity]"))
 
         # custom exclude pattern can be used
         newrelic_marklogic_plugin.RunPlugin.process_metric(metrics, prefix, response, "xyz", "xyz")
@@ -109,7 +118,7 @@ class PluginTests(unittest.TestCase):
         status_obj = {
             "server-status": {"status-properties": {"foo": {"units": "quantity", "value": 1}, "bar": 2},
                               "status-extra-properties": {"foo2": {"units": "quantity", "value": 3}, "bar2": 4}
-                              },
+                             },
             "server-extra-status": "should be ignored"
         }
         prefix = "Component/test/"
@@ -119,8 +128,14 @@ class PluginTests(unittest.TestCase):
         self.assertEqual(payload.get("Component/test/bar"), 2)
 
     def test_get_summary_status(self):
-        metrics = {}
         status = MarkLogicStatus(scheme=self.nrml.ml_scheme, user=self.nrml.ml_user, passwd=self.nrml.ml_pass, auth=self.nrml.ml_auth, host=self.nrml.ml_host, port=self.nrml.ml_port)
         payload = self.nrml.get_summary_status(status)
-        log.debug(payload)
+        LOG.debug(payload)
         self.assertGreater(len(payload.keys()), 0)
+
+    def test_get_server_detail_status(self):
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", port=8002, host="localhost", auth="DIGEST")
+        metrics = self.nrml.get_server_detail_status(status, "nocolon")
+        self.assertFalse(metrics)
+        metrics = self.nrml.get_server_detail_status(status, "Manage:Default")
+        self.assertTrue(metrics)
