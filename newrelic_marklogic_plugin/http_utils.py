@@ -91,8 +91,8 @@ class HTTPUtil(object):
                 requests.Timeout,
                 requests.ConnectionError) as exception:
             LOG.error(exception)
-        except requests.exceptions.RequestException as e:
-            log.error(e)
+        except requests.exceptions.RequestException as exception:
+            LOG.error(exception)
             sys.exit(1)
         return
 
@@ -115,7 +115,7 @@ class HTTPUtil(object):
                 requests.Timeout,
                 requests.ConnectionError) as exception:
             LOG.error(exception)
-        except requests.exceptions.RequestException as e:
-            LOG.error(e)
+        except requests.exceptions.RequestException as exception:
+            LOG.error(exception)
             sys.exit(1)
         return
