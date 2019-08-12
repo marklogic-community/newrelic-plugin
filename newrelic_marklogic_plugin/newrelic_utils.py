@@ -27,7 +27,7 @@ docs for newrelic api - https://docs.newrelic.com/docs/apis
 
 import json
 import logging
-import newrelic_marklogic_plugin.__init__
+from newrelic_marklogic_plugin.__init__ import __version__
 from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 LOG = logging.getLogger(__name__)
@@ -37,13 +37,12 @@ class NewRelicUtility(object):
     """
     Upload metrics to New Relic
     """
-    def __init__(self, host='localhost', pid='default', version=newrelic_marklogic_plugin.__init__.__version__):
+    def __init__(self, host='localhost', pid='default', version=__version__):
         LOG.debug('init NewRelicUtility')
         self.host = host
         self.pid = pid
         self.version = version
 
-    @staticmethod
     def update_newrelic(self, host=None, version=None, pid=None, name=None, guid=None, duration=None, metrics=None,
                         key=None, http_proxy=None, https_proxy=None):
         LOG.debug('update newrelic')
@@ -66,9 +65,7 @@ class NewRelicUtility(object):
             return HTTPUtil.http_post(
                 scheme="https",
                 url="https://platform-api.newrelic.com/platform/v1/metrics",
-                headers={'Accept': 'application/json',
-                         'Content-Type': 'application/json',
-                         'X-License-Key': key},
+                headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'X-License-Key': key},
                 payload=data,
                 http_proxy=http_proxy,
                 https_proxy=https_proxy)
