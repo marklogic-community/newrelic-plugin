@@ -27,11 +27,10 @@ import re
 import sys
 import time
 import logging
-
 import ConfigParser  # TBD- python 3.5 does not have this module
 
-import newrelic_utils
-from marklogic_status import MarkLogicStatus
+import newrelic_marklogic_plugin.newrelic_utils
+from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
 __version__ = '0.2.9'
 
@@ -46,7 +45,7 @@ DECL = {
 LOG = logging.getLogger(__name__)
 
 
-class RunPlugin:
+class RunPlugin(object):
     def __init__(self, pidFile=None, logFile=None, confFile=None):
 
         # setup configuration
@@ -55,7 +54,7 @@ class RunPlugin:
             LOG.debug('parse config')
             config = ConfigParser.ConfigParser()
             config.read(self.confFile)
-            LOG.debug(config.get('marklogic', 'host'))
+
             self.ml_host = config.get('marklogic', 'host')
             self.ml_port = config.getint('marklogic', 'port')
             self.ml_url = "http://" + self.ml_host + ":"
@@ -154,17 +153,16 @@ class RunPlugin:
         if self.plugin_servers:
             metrics.update(self.get_server_detail_status(status, self.plugin_servers))
 
-        update_newrelic = newrelic_utils.NewRelicUtility.update_newrelic(self,
-                                                                         host=self.ml_host,
-                                                                         pid=1,
-                                                                         version=__version__,
-                                                                         name=self.plugin_name,
-                                                                         guid=self.plugin_guid,
-                                                                         duration=self.plugin_duration,
-                                                                         metrics=metrics,
-                                                                         key=self.nr_license_key,
-                                                                         http_proxy=self.nr_http_proxy,
-                                                                         https_proxy=self.nr_https_proxy)
+        update_newrelic = newrelic_utils.NewRelicUtility().update_newrelic(host=self.ml_host,
+                                                                           pid=1,
+                                                                           version=__version__,
+                                                                           name=self.plugin_name,
+                                                                           guid=self.plugin_guid,
+                                                                           duration=self.plugin_duration,
+                                                                           metrics=metrics,
+                                                                           key=self.nr_license_key,
+                                                                           http_proxy=self.nr_http_proxy,
+                                                                           https_proxy=self.nr_https_proxy)
 
         if "error" in update_newrelic:
             LOG.error(update_newrelic["error"])
@@ -210,17 +208,21 @@ class RunPlugin:
                     cls.process_metric(metrics, prefix, properties, key)
         return metrics
 
-    def get_database_detail_status(self, status, databases):
-        return self.get_resource_detail_status(status, "databases", databases)
+    @classmethod
+    def get_database_detail_status(cls, status, databases):
+        return cls.get_resource_detail_status(status, "databases", databases)
 
-    def get_host_detail_status(self, status, hosts):
-        return self.get_resource_detail_status(status, "hosts", hosts)
+    @classmethod
+    def get_host_detail_status(cls, status, hosts):
+        return cls.get_resource_detail_status(status, "hosts", hosts)
 
-    def get_forest_detail_status(self, status, forests):
-        return self.get_resource_detail_status(status, "forests", forests)
+    @classmethod
+    def get_forest_detail_status(cls, status, forests):
+        return cls.get_resource_detail_status(status, "forests", forests)
 
-    def get_group_detail_status(self, status, groups):
-        return self.get_resource_detail_status(status, "groups", groups)
+    @classmethod
+    def get_group_detail_status(cls, status, groups):
+        return cls.get_resource_detail_status(status, "groups", groups)
 
     @classmethod
     def get_server_detail_status(cls, status, servers):
@@ -234,15 +236,14 @@ class RunPlugin:
         metrics = {}
         for server_group in re.split(" ", servers):
             server_group_tuple = server_group.split(":")
-            server = server_group_tuple[0]
-            group = server_group_tuple[1]
-            if server and group:
+            if len(server_group_tuple) == 2:
+                server, group = server_group_tuple
                 LOG.debug("Requesting server details for name: " + server + " group: " + group)
                 server_status = status.get(resource="servers", name=server, group=group)
                 prefix = "Component/servers/" + server + "/"
                 metrics.update(cls.process_status(prefix, server_status))
             else:
-                LOG.error("cannot retrieve %s server status, check configuration", server)
+                LOG.error("cannot retrieve %s server status, check configuration", server_group)
         return metrics
 
     @classmethod
@@ -271,13 +272,11 @@ class RunPlugin:
         :return:
         """
         metrics = {}
-        for status_key in status_obj:
-            if status_key.endswith("-status"):
-                status = status_obj[status_key]
-                if isinstance(status, dict):
-                    properties = status["status-properties"]
-                    for key in properties:
-                        cls.process_metric(metrics, prefix, properties, key)
+        for status_key, status in status_obj.items():
+            if status_key.endswith("-status") and isinstance(status, dict):
+                properties = status["status-properties"]
+                for key in properties:
+                    cls.process_metric(metrics, prefix, properties, key)
         return metrics
 
     @staticmethod
