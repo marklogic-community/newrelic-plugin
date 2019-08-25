@@ -346,15 +346,26 @@ class RunPlugin(object):
                     for key in value:
                         cls.process_metric(metrics, metric_prefix, value, key)
                 elif prop.endswith("-detail"):
-                    property_prefix = prefix
+                    metric_prefix = prefix
+                    #  maintaining for backwards compatability (for now), but I don't like how get_host_detail_status breaks the convention for *-detail properties
                     if prop != "status-detail":
-                        property_prefix += "detail/"
+                        metric_prefix += "detail/"
                     for detail in value:
-                        cls.process_metric(metrics, property_prefix, value, detail)
+                        cls.process_metric(metrics, metric_prefix, value, detail)
                 elif value.get("units", "") == "bool":
                     LOG.debug("ignoring: %s", prop)
                 else:
                     cls.set_metric(metrics, prefix, obj, prop)
+            elif isinstance(value, list):
+                if prop == "host-detail":
+                    # host details can be obtained from get_host_detail_status, ignoring in get_server_detail_status
+                    LOG.debug("Ignoring host-detail")
+                else:
+                    metric_prefix = prefix + prop + "/"
+                    for value_obj in value:
+                        if isinstance(value_obj, dict):
+                            for key in value_obj:
+                                cls.process_metric(metrics, metric_prefix, value_obj, key)
             else:
                 cls.set_metric(metrics, prefix, obj, prop)
 
