@@ -57,7 +57,7 @@ class RunPlugin(object):
         try:
             LOG.debug('parse config')
             config = configparser.ConfigParser()
-            config["DEFAULT"] = {'verify': False}
+            config.set('DEFAULT', 'verify', 'False')
             config.read(self.confFile)
 
             self.ml_host = config.get('marklogic', 'host')
@@ -67,9 +67,9 @@ class RunPlugin(object):
             self.ml_scheme = config.get('marklogic', 'scheme')
             self.ml_auth = config.get('marklogic', 'auth')
             self.ml_verify = config.get('marklogic', 'verify')
-            if self.ml_verify == "False":
+            if self.ml_verify == 'False':
                 self.ml_verify = False
-            elif self.ml_verify == "True":
+            elif self.ml_verify == 'True':
                 self.ml_verify = True
 
             self.nr_license_key = config.get('newrelic', 'key')
