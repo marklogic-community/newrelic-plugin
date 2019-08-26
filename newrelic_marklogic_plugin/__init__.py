@@ -57,17 +57,21 @@ class RunPlugin(object):
         try:
             LOG.debug('parse config')
             config = configparser.ConfigParser()
+            config["DEFAULT"] = {'verify': False}
             config.read(self.confFile)
 
             self.ml_host = config.get('marklogic', 'host')
             self.ml_port = config.getint('marklogic', 'port')
-            self.ml_url = "http://" + self.ml_host + ":"
-            self.ml_url += repr(self.ml_port)
-            LOG.debug(self.ml_url)
             self.ml_user = config.get('marklogic', 'user')
             self.ml_pass = config.get('marklogic', 'pass')
             self.ml_scheme = config.get('marklogic', 'scheme')
             self.ml_auth = config.get('marklogic', 'auth')
+            self.ml_verify = config.get('marklogic', 'verify')
+            if self.ml_verify == "False":
+                self.ml_verify = False
+            elif self.ml_verify == "True":
+                self.ml_verify = True
+
             self.nr_license_key = config.get('newrelic', 'key')
             self.nr_http_proxy = config.get('newrelic', 'http_proxy')
             self.nr_https_proxy = config.get('newrelic', 'https_proxy')
@@ -100,7 +104,7 @@ class RunPlugin(object):
             self.pidfile_path = pidFile or DECL['pidFile']
             self.pidfile_timeout = 5
 
-        except ConfigParser.ParsingError as error:
+        except configparser.ParsingError as error:
             LOG.error("Problem with configuration.")
             LOG.error(error)
 
@@ -119,7 +123,7 @@ class RunPlugin(object):
         :return:
         """
         LOG.debug("retrieve statuses and update newrelic")
-        status = MarkLogicStatus(scheme=self.ml_scheme, user=self.ml_user, passwd=self.ml_pass, auth=self.ml_auth, host=self.ml_host, port=self.ml_port)
+        status = MarkLogicStatus(scheme=self.ml_scheme, user=self.ml_user, passwd=self.ml_pass, auth=self.ml_auth, host=self.ml_host, port=self.ml_port, verify=self.ml_verify)
         metrics = {}
         # retrieve summary status
         if self.plugin_summary_status:

@@ -111,6 +111,11 @@ The 'marklogic' section contains connection details to MarkLogic server and Mana
     # Password to use when accessing MarkLogic management REST API.
     pass = admin
 
+    # (optional) Either a boolean, in which case it controls whether we verify
+    # the server's TLS certificate, or a string, in which case it must be a path
+    # to a CA bundle to use. Defaults to ``False``.
+    verify = False
+
 The 'newrelic' section specifies the NewRelic license key. Optionally you may nominate a proxy for accessing the NewRelic Plugin API.
 
 ::

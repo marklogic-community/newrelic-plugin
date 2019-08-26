@@ -33,3 +33,4 @@ class NewRelicMarkLogicTest(unittest.TestCase):
         self.assertEqual(str(plugin.logFile), "test.log")
         self.assertEqual(str(plugin.confFile), "etc/newrelic_marklogic.conf.sample")
         self.assertTrue("test.pid" in plugin.pidfile_path)
+        self.assertFalse(plugin.ml_verify)

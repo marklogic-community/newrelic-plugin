@@ -144,3 +144,6 @@ class PluginTests(unittest.TestCase):
         self.assertFalse(metrics)
         metrics = self.nrml.get_server_detail_status(status, "Manage:Default")
         self.assertTrue(metrics)
+
+    def test_verify(self):
+        self.assertFalse(self.nrml.ml_verify)

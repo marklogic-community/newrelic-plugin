@@ -39,7 +39,7 @@ class MarkLogicStatus(object):
     """
     scheme = "http"
 
-    def __init__(self, scheme=None, url=None, user=None, passwd=None, port=None, host=None, auth=None):
+    def __init__(self, scheme=None, url=None, user=None, passwd=None, port=None, host=None, auth=None, verify=False):
         self.url = url
         self.user = user
         self.passwd = passwd
@@ -47,6 +47,7 @@ class MarkLogicStatus(object):
         self.port = port
         self.host = host
         self.auth = auth
+        self.verify = verify
 
     def get(self, resource=None, name=None, group=None):
         """
@@ -74,7 +75,8 @@ class MarkLogicStatus(object):
                                      user=self.user,
                                      passwd=self.passwd,
                                      realm="public",
-                                     auth=self.auth)
+                                     auth=self.auth,
+                                     verify=self.verify)
         except Exception as exception:
             LOG.error("Problem accessing MarkLogic Management API")
             LOG.error(exception)

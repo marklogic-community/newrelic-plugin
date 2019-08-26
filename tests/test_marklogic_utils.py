@@ -29,7 +29,7 @@ HOST = "node1"
 
 class MarkLogicUtilsTests(unittest.TestCase):
     def test_rest(self):
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST")
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=False)
         response = status.get()
         LOG.debug(response)
         self.assertEqual(status.scheme, "http")
@@ -40,3 +40,13 @@ class MarkLogicUtilsTests(unittest.TestCase):
         self.assertEqual(status.auth, "DIGEST")
         self.assertTrue(isinstance(response, dict))
         self.assertIsNotNone(response["local-cluster-status"])
+
+    def test_verify(self):
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST")
+        self.assertFalse(status.verify)
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=False)
+        self.assertFalse(status.verify)
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=True)
+        self.assertTrue(status.verify)
+        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify="/path/to/cacerts")
+        self.assertEqual(status.verify, "/path/to/cacerts")

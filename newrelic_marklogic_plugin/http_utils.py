@@ -67,13 +67,13 @@ class HTTPUtil(object):
 
     @staticmethod
     def http_get(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                 headers={'Accept': 'application/json'}, format="json", http_proxy=None, https_proxy=None):
+                 headers={'Accept': 'application/json'}, format="json", http_proxy=None, https_proxy=None, verify=True):
         LOG.debug("dereference http GET")
         try:
             requrl = HTTPUtil.get_request_url(url, scheme, host, port, path)
             auth = HTTPUtil.get_auth(auth, user, passwd)
             proxies = HTTPUtil.get_proxies(http_proxy, https_proxy)
-            response = requests.get(requrl, auth=auth, headers=headers, proxies=proxies)
+            response = requests.get(requrl, auth=auth, headers=headers, proxies=proxies, verify=verify)
             if response.status_code == 200:
                 if format == "json":
                     return response.json()
@@ -98,13 +98,13 @@ class HTTPUtil(object):
 
     @staticmethod
     def http_post(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                  headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None, https_proxy=None):
+                  headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None, https_proxy=None, verify=True):
         LOG.debug("execute http post call")
         try:
             requrl = HTTPUtil.get_request_url(url, scheme, host, port, path)
             auth = HTTPUtil.get_auth(auth, user, passwd)
             proxies = HTTPUtil.get_proxies(http_proxy, https_proxy)
-            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxies)
+            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxies, verify=verify)
             if format == "json":
                 return response.json()
             else:
