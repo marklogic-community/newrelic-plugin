@@ -41,7 +41,7 @@ pass = admin
 
 [newrelic]
 
-# Your NewRelic license key.
+# Your New Relic license key.
 key =
 
 # Proxy (ex. http://10.10.1.10:3128).
@@ -50,10 +50,10 @@ https_proxy =
 
 [plugin]
 
-# NewRelic plugin display name.
+# New Relic plugin display name.
 name = marklogic
 
-# Unique NewRelic plugin guid.
+# Unique New Relic plugin guid.
 guid = com.marklogic
 
 # Sample period in seconds.

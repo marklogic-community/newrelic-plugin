@@ -24,7 +24,7 @@ Require minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
 Require minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
 and running.
 
-Require `NewRelic <http://www.newrelic.com/>`__ account.
+Require `New Relic <http://www.newrelic.com/>`__ account.
 
 Docs
 ----
@@ -116,7 +116,7 @@ The 'marklogic' section contains connection details to MarkLogic server and Mana
     # to a CA bundle to use. Defaults to ``False``.
     verify = False
 
-The 'newrelic' section specifies the NewRelic license key. Optionally you may nominate a proxy for accessing the NewRelic Plugin API.
+The 'newrelic' section specifies the New Relic license key. Optionally you may nominate a proxy for accessing the New Relic Plugin API.
 
 ::
 
@@ -128,9 +128,9 @@ The 'newrelic' section specifies the NewRelic license key. Optionally you may no
     # Proxy (ex. http://10.10.1.10:3128).
     http_proxy =
 
-The 'plugin' section defines sample period for updating NewRelic, as well as the logging level for emitting messages about plugin operation.
+The 'plugin' section defines sample period for updating New Relic, as well as the logging level for emitting messages about plugin operation.
 
-There are a set of configurations for defining which statuses are captured by NewRelic, summarised below.
+There are a set of configurations for defining which statuses are captured by New Relic, summarised below.
 
 - summary_status (True|False): retrieve local cluster summary status.
 - databases (list of databases): retrieve database detailed status.
@@ -146,10 +146,10 @@ There are a set of configurations for defining which statuses are captured by Ne
 
     [plugin]
 
-    # NewRelic plugin display name.
+    # New Relic plugin display name.
     name = myMarkLogicServer
 
-    # Unique NewRelic plugin guid.
+    # Unique New Relic plugin guid.
     guid = com.marklogic
 
     # Sample period in seconds.

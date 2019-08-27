@@ -11,7 +11,7 @@ def main():
     setup(
         base_dir=dirname(__file__),
         name='newrelic_marklogic_plugin',
-        description='NewRelic plugin for monitoring MarkLogic.',
+        description='New Relic plugin for monitoring MarkLogic.',
         long_description=open(join(base_dir, 'README.rst'), encoding='utf-8').read(),
         version=newrelic_marklogic_plugin.__version__,
         packages=find_packages(),
