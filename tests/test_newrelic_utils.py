@@ -33,7 +33,8 @@ class NewRelicUtilsTests(unittest.TestCase):
         self.assertEqual(utility.pid, "default")
         self.assertEqual(utility.version, newrelic_marklogic_plugin.__version__)
 
-    def test_update(self):
+    @staticmethod
+    def update(api_key):
         response = NewRelicUtility().update_newrelic(host=HOST,
                                                      pid=1234,
                                                      version="0.0.1",
@@ -41,6 +42,10 @@ class NewRelicUtilsTests(unittest.TestCase):
                                                      guid="com.marklogic",
                                                      duration=60,
                                                      metrics={"Component/MarkLogic[UnitTest]": 100},
-                                                     key="e8cf9b3d7aaca22a8632c7e01a14f8e722519b8a")
+                                                     key=api_key)
         LOG.debug(response)
-        assert response
+        return response
+
+    # API_KEY is needed in order to test the New Relic API. Uncomment and add a key to test
+    #def test_update(self):
+    #    self.assertIsNotNone(self.update("ADD_YOUR_API_KEY_HERE"))
