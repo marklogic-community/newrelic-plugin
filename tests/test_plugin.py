@@ -37,7 +37,7 @@ class PluginTests(unittest.TestCase):
                                                confFile='etc/newrelic_marklogic.conf.sample')
 
     def test_version(self):
-        assert newrelic_marklogic_plugin.__version__ == "0.2.9"
+        assert newrelic_marklogic_plugin.__version__ == "0.3.0"
 
     def test_RunPlugin(self):
         self.held, sys.stdout = sys.stdout, StringIO()

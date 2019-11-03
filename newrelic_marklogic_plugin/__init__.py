@@ -36,7 +36,7 @@ except:
 import newrelic_marklogic_plugin.newrelic_utils
 from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
-__version__ = '0.2.9'
+__version__ = '0.3.0'
 
 
 DECL = {
