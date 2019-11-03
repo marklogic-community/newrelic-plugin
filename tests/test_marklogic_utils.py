@@ -24,29 +24,34 @@ from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
 LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-HOST = "node1"
+HOST = "localhost"
+USER = "admin"
+PASS = "admin"
+AUTH = "DIGEST"
+SCHEME = "http"
+PORT = 8002
 
 
 class MarkLogicUtilsTests(unittest.TestCase):
     def test_rest(self):
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=False)
+        status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify=False)
         response = status.get()
         LOG.debug(response)
-        self.assertEqual(status.scheme, "http")
-        self.assertEqual(status.user, "admin")
-        self.assertEqual(status.passwd, "admin")
+        self.assertEqual(status.scheme, SCHEME)
+        self.assertEqual(status.user, USER)
+        self.assertEqual(status.passwd, PASS)
         self.assertEqual(status.host, HOST)
-        self.assertEqual(status.port, 8002)
-        self.assertEqual(status.auth, "DIGEST")
+        self.assertEqual(status.port, PORT)
+        self.assertEqual(status.auth, AUTH)
         self.assertTrue(isinstance(response, dict))
         self.assertIsNotNone(response["local-cluster-status"])
 
     def test_verify(self):
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST")
+        status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH)
         self.assertFalse(status.verify)
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=False)
+        status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify=False)
         self.assertFalse(status.verify)
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify=True)
+        status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify=True)
         self.assertTrue(status.verify)
-        status = MarkLogicStatus(scheme="http", user="admin", passwd="admin", host=HOST, port=8002, auth="DIGEST", verify="/path/to/cacerts")
+        status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify="/path/to/cacerts")
         self.assertEqual(status.verify, "/path/to/cacerts")

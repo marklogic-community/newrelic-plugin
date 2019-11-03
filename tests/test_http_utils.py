@@ -26,7 +26,12 @@ from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
 LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-HOST = "node1"
+HOST = "localhost"
+PORT = 8002
+USER = "admin"
+PASS= "admin"
+SCHEME = "http"
+AUTH = "DIGEST"
 
 
 class HTTPUtilTests(unittest.TestCase):
@@ -73,12 +78,12 @@ class HTTPUtilTests(unittest.TestCase):
         self.assertIsNone(HTTPUtil.get_auth())
 
     def test_http_get_status(self):
-        response = HTTPUtil.http_get("http", HOST, 8002, "/manage/v2?view=status", "admin", "admin", "public", "DIGEST")
+        response = HTTPUtil.http_get(SCHEME, HOST, PORT, "/manage/v2?view=status&format=json", USER, PASS, "public", AUTH)
         self.assertTrue(isinstance(response, dict))
         self.assertIsNotNone(response["local-cluster-status"])
 
     def test_http_get_status_params(self):
-        response = HTTPUtil.http_get(scheme="http", host=HOST, port=8002, path="/manage/v2?view=status", user="admin", passwd="admin", realm="public", auth="DIGEST")
+        response = HTTPUtil.http_get(scheme=SCHEME, host=HOST, port=PORT, path="/manage/v2?view=status&format=json", user=USER, passwd=PASS, realm="public", auth=AUTH)
         self.assertTrue(isinstance(response, dict))
         self.assertIsNotNone(response["local-cluster-status"])
 
