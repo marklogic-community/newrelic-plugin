@@ -1,8 +1,10 @@
 from __future__ import unicode_literals, print_function
-from distutils.core import setup
 from codecs import open
 from os.path import dirname, join
-from setuptools import setup, find_packages
+try:
+    from setuptools import setup, find_packages
+except ImportError:
+    from distutils.core import setup
 import newrelic_marklogic_plugin
 
 
@@ -13,10 +15,11 @@ def main():
         name='newrelic_marklogic_plugin',
         description='New Relic plugin for monitoring MarkLogic.',
         long_description=open(join(base_dir, 'README.rst'), encoding='utf-8').read(),
+        long_description_content_type='text/markdown',
         version=newrelic_marklogic_plugin.__version__,
         packages=find_packages(),
         url='https://github.com/marklogic-community/newrelic-plugin',
-        license=open(join(base_dir, 'LICENSE'), encoding='utf-8').read(),
+        license='Apache License 2.0',
         author='James Fuller',
         author_email='jim.fuller@marklogic.com',
         classifiers=['Programming Language :: Python',
