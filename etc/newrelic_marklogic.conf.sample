@@ -63,28 +63,28 @@ duration = 60
 log_level = INFO
  
 # Local cluster summary.
-summary_status= True
+summary_status = True
 
 # Database(s) detail status.
-databases=
+databases =
 
 # Hosts summary.
-hosts_summary_status= False
+hosts_summary_status = False
 
 # Host(s) detail status.
-hosts=
+hosts =
 
 # Forests summary.
-forests_summary_status= False
+forests_summary_status = False
 
 # Forest(s) detail status.
-forests=
+forests =
 
 # Group(s) detail status.
-groups=
+groups =
 
 # Servers summary.
-servers_summary_status= False
+servers_summary_status = False
 
 # Server(s) detail status (must supply group name ex. ServerName:GroupName).
-servers=
+servers =
