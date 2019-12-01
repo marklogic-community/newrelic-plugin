@@ -29,7 +29,7 @@ import time
 import logging
 try:
     import configparser
-except:
+except ImportError:
     # Python2
     import ConfigParser as configparser
 
