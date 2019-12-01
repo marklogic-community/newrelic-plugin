@@ -24,7 +24,6 @@ from newrelic_marklogic_plugin.newrelic_utils import NewRelicUtility
 
 LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-HOST = "node1"
 
 class NewRelicUtilsTests(unittest.TestCase):
     def test_init(self):
@@ -35,7 +34,7 @@ class NewRelicUtilsTests(unittest.TestCase):
 
     @staticmethod
     def update(api_key):
-        response = NewRelicUtility().update_newrelic(host=HOST,
+        response = NewRelicUtility().update_newrelic(host="localhost",
                                                      pid=1234,
                                                      version="0.0.1",
                                                      name="marklogic_unittest",
