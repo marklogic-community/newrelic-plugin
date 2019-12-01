@@ -37,9 +37,8 @@ class MarkLogicStatus(object):
     """
     Construct a MarkLogic Manage API URL and retrieve the payload
     """
-    scheme = "http"
 
-    def __init__(self, scheme=None, url=None, user=None, passwd=None, port=None, host=None, auth=None, verify=False):
+    def __init__(self, scheme="http", url=None, user=None, passwd=None, port=8002, host=None, auth=None, verify=False):
         self.url = url
         self.user = user
         self.passwd = passwd

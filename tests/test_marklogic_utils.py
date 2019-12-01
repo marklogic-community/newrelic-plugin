@@ -33,6 +33,7 @@ PORT = 8002
 
 
 class MarkLogicUtilsTests(unittest.TestCase):
+
     def test_rest(self):
         status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify=False)
         response = status.get()
@@ -55,3 +56,24 @@ class MarkLogicUtilsTests(unittest.TestCase):
         self.assertTrue(status.verify)
         status = MarkLogicStatus(scheme=SCHEME, user=USER, passwd=PASS, host=HOST, port=PORT, auth=AUTH, verify="/path/to/cacerts")
         self.assertEqual(status.verify, "/path/to/cacerts")
+
+    def test_defaults(self):
+        status = MarkLogicStatus()
+        self.assertEqual(status.scheme, "http")
+        self.assertEqual(status.host, None)
+        self.assertEqual(status.user, None)
+        self.assertEqual(status.passwd, None)
+        self.assertEqual(status.port, 8002)
+        self.assertEqual(status.auth, None)
+        self.assertEqual(status.verify, False)
+        self.assertEqual(status.url, None)
+
+    def test_default_override(self):
+        status = MarkLogicStatus(scheme="xcc", user="user", passwd="pass", port=123, host="host", auth="BASIC", verify=True)
+        self.assertEqual(status.scheme, "xcc")
+        self.assertEqual(status.port, 123)
+        self.assertEqual(status.auth, "BASIC")
+        self.assertEqual(status.verify, True)
+        self.assertEqual(status.user, "user")
+        self.assertEqual(status.passwd, "pass")
+        self.assertEqual(status.host, "host")
