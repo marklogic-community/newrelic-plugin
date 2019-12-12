@@ -1,37 +1,32 @@
 newrelic-marklogic-plugin
 =========================
 
-`NewRelic <http://www.newrelic.com>`__ plugin for monitoring
-MarkLogic.
+`NewRelic <http://www.newrelic.com>`__ plugin for monitoring MarkLogic.
 
 Features
 --------
 
 -  Easy to install
 -  Configurable selection of metrics to retrieve
--  Retrieve summary metrics on local cluster, hosts, servers & forests.
--  Retrieve detail metrics on databases, forests, hosts, groups & servers.
+-  Retrieve summary metrics on local cluster, hosts, servers & forests
+-  Retrieve detail metrics on databases, forests, hosts, groups & servers
 -  Proxy access to NewRelic api
 -  Sample monitoring dashboards available at `NewRelic plugin central <https://newrelic.com/plugins>`__.
 
 Before you start
 ----------------
 
-Require minimally `Python 2.7.10  <https://www.python.org/>`__ installed.
-
-`Requests python package <https://pypi.python.org/pypi/requests>`__ v2.11 or greater.
-
-Require minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed
-and running.
-
-Require `New Relic <http://www.newrelic.com/>`__ account.
+- Require minimally `Python 2.7.10  <https://www.python.org/>`__ installed
+- `Requests python package <https://pypi.python.org/pypi/requests>`__ v2.11 or greater
+- Require minimally `MarkLogic v7.0-6 <http://developer.marklogic.com/products>`__ installed and running
+- Require `New Relic <http://www.newrelic.com/>`__ account
 
 Docs
 ----
 
-`newrelic-marklogic-plugin docs on github <https://github.com/marklogic-community/newrelic-plugin>`__
+- `newrelic-marklogic-plugin docs on github <https://github.com/marklogic-community/newrelic-plugin>`__
 
-`newrelic-marklogic-plugin docs on pypi <https://pypi.python.org/pypi/newrelic-marklogic-plugin>`__
+- `newrelic-marklogic-plugin docs on pypi <https://pypi.python.org/pypi/newrelic-marklogic-plugin>`__
 
 
 Install, configure & run
@@ -159,31 +154,31 @@ There are a set of configurations for defining which statuses are captured by Ne
     log_level = DEBUG
 
     # Local cluster summary.
-    summary_status= False
+    summary_status = False
 
     # Database(s) detail status.
-    databases= Documents
+    databases = Documents
 
     # Hosts summary.
-    hosts_summary_status= True
+    hosts_summary_status = True
 
     # Host(s) detail status.
-    hosts= 127.0.0.1
+    hosts = 127.0.0.1
 
     # Forests summary.
-    forests_summary_status= True
+    forests_summary_status = True
 
     # Forest(s) detail status.
-    forests= Documents Meters
+    forests = Documents Meters
 
     # Group(s) detail status.
-    groups= Default
+    groups = Default
 
     # Servers summary.
-    servers_summary_status= True
+    servers_summary_status = True
 
     # Server(s) detail status (must supply group name ex. ServerName:GroupName).
-    servers= Manage:Default
+    servers = Manage:Default
 
 Create pypi distribution
 ---------------------------------------
