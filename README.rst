@@ -25,26 +25,24 @@ Docs
 ----
 
 - `newrelic-marklogic-plugin docs on github <https://github.com/marklogic-community/newrelic-plugin>`__
-
 - `newrelic-marklogic-plugin docs on pypi <https://pypi.python.org/pypi/newrelic-marklogic-plugin>`__
-
 
 Install, configure & run
 ------------------------
 
 Install the plugin using any of the following methods.
 
-- install from pypi repository
+- install from pypi repository:
 
-    ``pip install newrelic-marklogic-plugin``
+  ``pip install newrelic-marklogic-plugin``
 
-- install direct from github
+- install direct from GitHub:
 
-    ``pip install https://github.com/marklogic-community/newrelic-plugin/archive/master.zip``
+  ``pip install https://github.com/marklogic-community/newrelic-plugin/archive/master.zip``
 
-- download `release <https://github.com/marklogic-community/newrelic-plugin/releases>`__  (or clone) repository and run the following.
+- download `release <https://github.com/marklogic-community/newrelic-plugin/releases>`__  (or clone) repository and run the following:
 
-    ``python setup.py install``
+  ``python setup.py install``
 
 
 Next step is to create and edit configuration file.
@@ -56,18 +54,18 @@ Next step is to create and edit configuration file.
 2) Edit ``newrelic_marklogic.conf`` ensuring correct MarkLogic
    connection details and NewRelic license key
 
-Start reporting metrics to NewRelic by running the following.
+Start reporting metrics to NewRelic by running the following:
 
-    ``newrelic_marklogic.py -c newrelic_marklogic.conf``
+``newrelic_marklogic.py -c newrelic_marklogic.conf``
 
 Which samples metrics every period of length duration as set within configuration.
 
 It is recommended to initiate plugin as a background task, run via a scheduler (ex. cron job) or using any other
 approach appropriate for your environment.
 
-Running with -h flag will emit usage instructions for running plugin.
+Running with -h flag will emit usage instructions for running plugin:
 
-    ``newrelic_marklogic.py -h``
+``newrelic_marklogic.py -h``
 
 ::
 
@@ -125,17 +123,17 @@ The 'newrelic' section specifies the New Relic license key. Optionally you may n
 
 The 'plugin' section defines sample period for updating New Relic, as well as the logging level for emitting messages about plugin operation.
 
-There are a set of configurations for defining which statuses are captured by New Relic, summarised below.
+There are a set of configurations for defining which statuses are captured by New Relic, summarized below.
 
-- summary_status (True|False): retrieve local cluster summary status.
-- databases (list of databases): retrieve database detailed status.
-- hosts_summary_status (True|False):  retrieve summary of all hosts status.
-- hosts (list of hosts): retrieve host detailed status.
-- forests_summary_status (True|False): retrieve summary of all forests status.
-- forests (list of forests): retrieve forest detailed status.
-- groups (list of groups): retrieve group detailed status.
-- servers_summary_status (True|False): retrieve summary of all servers status.
-- servers (list of servers): retrieve server detailed status.
+- **summary_status** (True|False): retrieve local cluster summary status.
+- **databases** (list of databases): retrieve database detailed status.
+- **hosts_summary_status** (True|False):  retrieve summary of all hosts status.
+- **hosts** (list of hosts): retrieve host detailed status.
+- **forests_summary_status** (True|False): retrieve summary of all forests status.
+- **forests** (list of forests): retrieve forest detailed status.
+- **groups** (list of groups): retrieve group detailed status.
+- **servers_summary_status** (True|False): retrieve summary of all servers status.
+- **servers** (list of servers): retrieve server detailed status.
 
 ::
 
@@ -183,15 +181,21 @@ There are a set of configurations for defining which statuses are captured by Ne
 Create pypi distribution
 ---------------------------------------
 
-To create an official distribution, first bump version number then test by
-creating distro on pypitest
+1. To create an official distribution, first ensure that all tests are passing:
 
-``python setup.py register -r pypitest``
+   ``python -m unittest discover -s tests``
 
-after verifying all is well you may generate distro on pypi:
+2. bump version number and create a distro:
 
-``python setup.py register -r pypi``
+   ``python setup.py sdist``
 
+3. Upload the package to pypitest:
+
+   ``python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
+
+4. after verifying all is well, generate the distro on pypi:
+
+   ``python setup.py register -r pypi``
 
 Issues, feature requests & contributing
 ---------------------------------------
@@ -205,7 +209,6 @@ Copyright & License
 
 newrelic-marklogic-plugin Copyright 2019 MarkLogic Corporation
 
-newrelic-marklogic-plugin is licensed under the Apache License, Version 2.0 (the "License"),
-a copy of the license is included within this package.
+newrelic-marklogic-plugin is licensed under the Apache License, Version 2.0 (the "License"). A copy of the license is included within this package.
 
 `Apache License v2.0 <https://github.com/marklogic-community/newrelic-plugin/blob/master/LICENSE>`__
