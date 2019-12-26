@@ -191,11 +191,11 @@ Create pypi distribution
 
 3. Upload the package to pypitest:
 
-   ``python -m twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
+   ``twine upload --repository-url https://test.pypi.org/legacy/ dist/*``
 
 4. after verifying all is well, generate the distro on pypi:
 
-   ``python setup.py register -r pypi``
+   ``twine upload dist/*``
 
 Issues, feature requests & contributing
 ---------------------------------------
