@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,58 +19,56 @@
 
 
 """
-module responsible for updating NewRelic
+module responsible for updating New Relic
 
-docs for newrelic api - https://docs.newrelic.com/docs/apis
+docs for New Relic API - https://docs.newrelic.com/docs/apis
 
 """
 
 import json
 import logging
-import __init__
-
+from newrelic_marklogic_plugin.__init__ import __version__
 from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class NewRelicUtility:
-    def __init__(self, host='localhost', pid='default', version=__init__.__version__):
-        log.debug('init NewRelicUtility')
+class NewRelicUtility(object):
+    """
+    Upload metrics to New Relic
+    """
+    def __init__(self, host='localhost', pid='default', version=__version__):
+        LOG.debug('init NewRelicUtility')
         self.host = host
         self.pid = pid
         self.version = version
 
-    @staticmethod
     def update_newrelic(self, host=None, version=None, pid=None, name=None, guid=None, duration=None, metrics=None,
                         key=None, http_proxy=None, https_proxy=None):
-        log.debug('update newrelic')
+        LOG.debug('update newrelic')
 
-        # construct newrelic agent
+        # construct New Relic agent
         agent = {'host': host or self.host, 'pid': pid or self.pid, 'version': version or self.version}
 
-        # construct newrelic components
+        # construct New Relic components
         components = []
         component = {'name': name, 'guid': guid, 'duration': duration, 'metrics': metrics}
         components.append(component)
 
-        # composite payload for sending to newrelic
+        # composite payload for sending to New Relic
         data = {'agent': agent, 'components': components}
-        log.debug("payload:")
-        log.debug(json.dumps(data))
+        LOG.debug("payload:")
+        LOG.debug(json.dumps(data))
 
-        # send to the NewRelic API, supplying correct headers and using proxy (if defined).
+        # send to the New Relic API, supplying correct headers and using proxy (if defined).
         try:
             return HTTPUtil.http_post(
                 scheme="https",
                 url="https://platform-api.newrelic.com/platform/v1/metrics",
-                headers={'Accept': 'application/json',
-                         'Content-Type': 'application/json',
-                         'X-License-Key': key},
+                headers={'Accept': 'application/json', 'Content-Type': 'application/json', 'X-License-Key': key},
                 payload=data,
                 http_proxy=http_proxy,
                 https_proxy=https_proxy)
-        except Exception as e:
-            log.error("Problem accessing NewRelic Plugin API")
-            log.error(e)
-            pass
+        except Exception as exception:
+            LOG.error("Problem accessing New Relic Plugin API")
+            LOG.error(exception)

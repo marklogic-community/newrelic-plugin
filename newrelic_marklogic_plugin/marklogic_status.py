@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -28,15 +28,17 @@ NOTE - did not use marklogic-python api as that package is based on python 3.
 """
 
 import logging
-from http_utils import HTTPUtil
+from newrelic_marklogic_plugin.http_utils import HTTPUtil
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class MarkLogicStatus:
-    scheme = "http"
+class MarkLogicStatus(object):
+    """
+    Construct a MarkLogic Manage API URL and retrieve the payload
+    """
 
-    def __init__(self, scheme=None, url=None, user=None, passwd=None, port=None, host=None, auth=None):
+    def __init__(self, scheme="http", url=None, user=None, passwd=None, port=8002, host=None, auth=None, verify=False):
         self.url = url
         self.user = user
         self.passwd = passwd
@@ -44,10 +46,16 @@ class MarkLogicStatus:
         self.port = port
         self.host = host
         self.auth = auth
+        self.verify = verify
 
     def get(self, resource=None, name=None, group=None):
-
-        # compose GET URI to MarkLogic Management REST API
+        """
+        compose GET URI to MarkLogic Management REST API
+        :param resource:
+        :param name:
+        :param group:
+        :return:
+        """
         path = "/manage/v2"
         if resource:
             path += "/" + resource
@@ -66,8 +74,8 @@ class MarkLogicStatus:
                                      user=self.user,
                                      passwd=self.passwd,
                                      realm="public",
-                                     auth=self.auth)
-        except Exception as e:
-            log.error("Problem accessing MarkLogic Management API")
-            log.error(e)
-            pass
+                                     auth=self.auth,
+                                     verify=self.verify)
+        except Exception as exception:
+            LOG.error("Problem accessing MarkLogic Management API")
+            LOG.error(exception)

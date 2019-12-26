@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,22 +19,32 @@
 
 import unittest
 import logging
+import newrelic_marklogic_plugin
 from newrelic_marklogic_plugin.newrelic_utils import NewRelicUtility
 
-log = logging.getLogger()
+LOG = logging.getLogger()
 logging.basicConfig(level=logging.DEBUG)
-host= "node1"
 
 class NewRelicUtilsTests(unittest.TestCase):
-    def testUpdate(self):
-        response = NewRelicUtility.update_newrelic(self,
-                                                   host=host,
-                                                   pid=1234,
-                                                   version="0.0.1",
-                                                   name="marklogic_unittest",
-                                                   guid="com.marklogic",
-                                                   duration=60,
-                                                   metrics={"Component/MarkLogic[UnitTest]": 100},
-                                                   key="e8cf9b3d7aaca22a8632c7e01a14f8e722519b8a")
-        log.debug(response)
-        assert response
+    def test_init(self):
+        utility = NewRelicUtility()
+        self.assertEqual(utility.host, "localhost")
+        self.assertEqual(utility.pid, "default")
+        self.assertEqual(utility.version, newrelic_marklogic_plugin.__version__)
+
+    @staticmethod
+    def update(api_key):
+        response = NewRelicUtility().update_newrelic(host="localhost",
+                                                     pid=1234,
+                                                     version="0.0.1",
+                                                     name="marklogic_unittest",
+                                                     guid="com.marklogic",
+                                                     duration=60,
+                                                     metrics={"Component/MarkLogic[UnitTest]": 100},
+                                                     key=api_key)
+        LOG.debug(response)
+        return response
+
+    # API_KEY is needed in order to test the New Relic API. Uncomment and add a key to test
+    #def test_update(self):
+    #    self.assertIsNotNone(self.update("ADD_YOUR_API_KEY_HERE"))

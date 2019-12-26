@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -26,23 +26,33 @@ import sys
 
 import newrelic_marklogic_plugin
 
-opts, args = getopt.getopt(sys.argv[1:], 'hc:l:p')
-pidfile = None
-logfile = None
-conffile = None
 
-# extract options
-for opt, val in opts:
-    if opt == '-h':
-        newrelic_marklogic_plugin.RunPlugin.usage()
-        sys.exit(0)
-    elif opt == '-c':
-        conffile = val
-    elif opt == '-l':
-        logfile = val
-    elif opt == '-p':
-        pidfile = val
+def init(args=None):
+    """
+    Extract options and initialize the New Relic plugin
+    :return:
+    """
+    opts, args = getopt.getopt(args, 'hc:l:p:')
 
-# start plugin run loop
-plugin = newrelic_marklogic_plugin.RunPlugin(confFile=conffile, logFile=logfile, pidFile=pidfile)
-plugin.run()
+    pid_file = None
+    log_file = None
+    conf_file = None
+
+    # extract options
+    for opt, val in opts:
+        if opt == '-h':
+            newrelic_marklogic_plugin.RunPlugin.usage()
+            sys.exit(0)
+        elif opt == '-c':
+            conf_file = val
+        elif opt == '-l':
+            log_file = val
+        elif opt == '-p':
+            pid_file = val
+    return newrelic_marklogic_plugin.RunPlugin(confFile=conf_file, logFile=log_file, pidFile={pid_file})
+
+
+if __name__ == "__main__":
+    # start plugin run loop
+    PLUGIN = init(sys.argv[1:])
+    PLUGIN.run()

@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -24,99 +24,98 @@ http utils dependent on requests module (https://github.com/kennethreitz/request
 """
 
 import logging
-import requests
 import sys
+import requests
 from requests.auth import HTTPDigestAuth, HTTPBasicAuth
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class HTTPUtil:
+class HTTPUtil(object):
 
     def __init__(self):
         pass
 
     @staticmethod
+    def get_request_url(url=None, scheme=None, host=None, port=None, path=None):
+        if url:
+            requrl = url
+        else:
+            requrl = scheme + "://" + host + ":" + repr(port) + path
+            LOG.debug(requrl)
+        return requrl
+
+    @staticmethod
+    def get_auth(auth=None, user=None, passwd=None):
+        if auth == "DIGEST":
+            auth = HTTPDigestAuth(user, passwd)
+        elif auth == "BASIC":
+            auth = HTTPBasicAuth(user, passwd)
+        else:
+            auth = None
+        return auth
+
+    @staticmethod
+    def get_proxies(http_proxy=None, https_proxy=None):
+        proxies = None
+        if http_proxy or https_proxy:
+            proxies = {
+                "http": http_proxy,
+                "https": https_proxy
+            }
+        return proxies
+
+    @staticmethod
     def http_get(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                 headers={'Accept': 'application/json'}, format="json", http_proxy=None,https_proxy=None):
-        log.debug("dereference http GET")
+                 headers={'Accept': 'application/json'}, format="json", http_proxy=None, https_proxy=None, verify=True):
+        LOG.debug("dereference http GET")
         try:
-            if url:
-                requrl = url
-            else:
-                requrl = scheme + "://" + host + ":"
-                requrl += repr(port)
-                requrl += path
-                log.debug(requrl)
-
-            if auth == "DIGEST":
-                auth = HTTPDigestAuth(user, passwd)
-            elif auth == "BASIC":
-                auth = HTTPBasicAuth(user, passwd)
-            else:
-                auth = None
-            proxies=None
-            if http_proxy or https_proxy:
-               proxies = {
-                    "http": http_proxy,
-                    "https": https_proxy
-                }
-            response = requests.get(requrl, auth=auth, headers=headers, proxies=proxies)
-
+            requrl = HTTPUtil.get_request_url(url, scheme, host, port, path)
+            auth = HTTPUtil.get_auth(auth, user, passwd)
+            proxies = HTTPUtil.get_proxies(http_proxy, https_proxy)
+            response = requests.get(requrl, auth=auth, headers=headers, proxies=proxies, verify=verify)
             if response.status_code == 200:
                 if format == "json":
                     return response.json()
                 else:
-                    log.error("Must dereference json representation.")
+                    LOG.error("Must dereference json representation.")
                     # return a response to aid testing http GET
                     return response
             else:
-                log.error("HTTP Request returned " + str(response.status_code) + " when accessing "+ requrl + " , check configuration.")
+                LOG.error("HTTP Request returned %s when accessing %s, check configuration.", str(response.status_code), requrl)
                 sys.exit(1)
             return
-
-        except requests.exceptions.Timeout:
-            log.error("timeout error")
-        except requests.exceptions.TooManyRedirects:
-            log.error("too many redirects")
-        except requests.exceptions.RequestException as e:
-            log.error(e)
+        except (requests.ConnectTimeout,
+                requests.HTTPError,
+                requests.ReadTimeout,
+                requests.Timeout,
+                requests.ConnectionError) as exception:
+            LOG.error(exception)
+        except requests.exceptions.RequestException as exception:
+            LOG.error(exception)
             sys.exit(1)
         return
 
     @staticmethod
     def http_post(scheme=None, host=None, port=None, path=None, user=None, passwd=None, realm=None, auth=None, url=None,
-                  headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None,https_proxy=None):
-        log.debug("execute http post call")
+                  headers={'Accept': 'application/json'}, format="json", payload=None, http_proxy=None, https_proxy=None, verify=True):
+        LOG.debug("execute http post call")
         try:
-            if url:
-                requrl = url
-            else:
-                requrl = scheme + "://" + host + ":"
-                requrl += repr(port)
-                requrl += path
-                log.debug(requrl)
-
-            if auth == "DIGEST":
-                auth = HTTPDigestAuth(user, passwd)
-            elif auth == "BASIC":
-                auth = HTTPBasicAuth(user, passwd)
-            else:
-                auth = None
-            proxies = {
-                "http": http_proxy,
-                "https": https_proxy}
-            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxies)
+            requrl = HTTPUtil.get_request_url(url, scheme, host, port, path)
+            auth = HTTPUtil.get_auth(auth, user, passwd)
+            proxies = HTTPUtil.get_proxies(http_proxy, https_proxy)
+            response = requests.post(requrl, json=payload, auth=auth, headers=headers, proxies=proxies, verify=verify)
             if format == "json":
                 return response.json()
             else:
                 return response.headers
-
-        except requests.exceptions.Timeout:
-            log.error("timeout error")
-        except requests.exceptions.TooManyRedirects:
-            log.error("too many redirects")
-        except requests.exceptions.RequestException as e:
-            log.error(e)
+        except (requests.ConnectTimeout,
+                requests.HTTPError,
+                requests.ReadTimeout,
+                requests.Timeout,
+                requests.ConnectionError) as exception:
+            LOG.error(exception)
+        except requests.exceptions.RequestException as exception:
+            LOG.error(exception)
             sys.exit(1)
         return

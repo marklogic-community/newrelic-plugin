@@ -2,7 +2,7 @@
 # -*- coding: utf-8 -*-
 
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -27,44 +27,51 @@ import re
 import sys
 import time
 import logging
+try:
+    import configparser
+except ImportError:
+    # Python2
+    import ConfigParser as configparser
 
-import ConfigParser  # TBD- python 3.5 does not have this module
+import newrelic_marklogic_plugin.newrelic_utils
+from newrelic_marklogic_plugin.marklogic_status import MarkLogicStatus
 
-import newrelic_utils
-from marklogic_status import MarkLogicStatus
-
-__version__ = '0.2.8'
+__version__ = '0.3.0'
 
 
-decl = {
+DECL = {
     'pidFile': 'newrelic_marklogic.pid',
     'logFile': 'newrelic_marklogic.log',
     'confFile': 'newrelic_marklogic.conf',
     'logLevel': logging.INFO
 }
 
-log = logging.getLogger(__name__)
+LOG = logging.getLogger(__name__)
 
 
-class RunPlugin:
+class RunPlugin(object):
     def __init__(self, pidFile=None, logFile=None, confFile=None):
 
         # setup configuration
-        self.confFile = confFile or decl['confFile']
+        self.confFile = confFile or DECL['confFile']
         try:
-            log.debug('parse config')
-            config = ConfigParser.ConfigParser()
+            LOG.debug('parse config')
+            config = configparser.ConfigParser()
+            config.set('DEFAULT', 'verify', 'False')
             config.read(self.confFile)
-            log.debug(config.get('marklogic', 'host'))
+
             self.ml_host = config.get('marklogic', 'host')
             self.ml_port = config.getint('marklogic', 'port')
-            self.ml_url = "http://" + self.ml_host + ":"
-            self.ml_url += repr(self.ml_port)
-            log.debug(self.ml_url)
             self.ml_user = config.get('marklogic', 'user')
             self.ml_pass = config.get('marklogic', 'pass')
             self.ml_scheme = config.get('marklogic', 'scheme')
             self.ml_auth = config.get('marklogic', 'auth')
+            self.ml_verify = config.get('marklogic', 'verify')
+            if self.ml_verify == 'False':
+                self.ml_verify = False
+            elif self.ml_verify == 'True':
+                self.ml_verify = True
+
             self.nr_license_key = config.get('newrelic', 'key')
             self.nr_http_proxy = config.get('newrelic', 'http_proxy')
             self.nr_https_proxy = config.get('newrelic', 'https_proxy')
@@ -82,400 +89,302 @@ class RunPlugin:
             self.plugin_servers = config.get('plugin', 'servers')
 
             # setup logging
-            self.logFile = logFile or decl['logFile']
-            self.log_level = config.get('plugin', 'log_level') or decl["logLevel"]
+            self.logFile = logFile or DECL['logFile']
+            self.log_level = config.get('plugin', 'log_level') or DECL["logLevel"]
             handler = logging.FileHandler(self.logFile, 'w')
-            formatter = logging.Formatter(
-                '%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
+            formatter = logging.Formatter('%(asctime)s %(name)-12s %(levelname)-8s %(message)s')
             handler.setFormatter(formatter)
-            log.addHandler(handler)
-            log.setLevel(self.log_level)
-            log.debug("init plugin")
+            LOG.addHandler(handler)
+            LOG.setLevel(self.log_level)
+            LOG.debug("init plugin")
             stream_handler = logging.StreamHandler(sys.stderr)
-            log.addHandler(stream_handler)
+            LOG.addHandler(stream_handler)
 
             # setup pid
-            self.pidfile_path = pidFile or decl['pidFile']
+            self.pidfile_path = pidFile or DECL['pidFile']
             self.pidfile_timeout = 5
 
-        except ConfigParser.ParsingError as e:
-            log.error("Problem with configuration.")
-            log.error(e)
+        except configparser.ParsingError as error:
+            LOG.error("Problem with configuration.")
+            LOG.error(error)
 
     def run(self):
-        log.info("newrelic_marklogic plugin now sending statuses to NewRelic Plugin API (to see more log messages change log_level=DEBUG).")
+        LOG.info("newrelic_marklogic plugin now sending statuses to NewRelic Plugin API (to see more log messages change log_level=DEBUG).")
         while True:
             try:
                 self.statusUpdate()
-            except Exception as e:
-                log.error(e)
+            except Exception as exception:
+                LOG.error(exception)
             time.sleep(self.plugin_duration)
 
     def statusUpdate(self):
-        log.debug("retrieve statuses and update newrelic")
-        status = MarkLogicStatus(scheme=self.ml_scheme, user=self.ml_user, passwd=self.ml_pass, auth=self.ml_auth,
-                                 host=self.ml_host, port=self.ml_port
-                                 )
+        """
+        Retrieve MarkLogic status information and post to New Relic
+        :return:
+        """
+        LOG.debug("retrieve statuses and update newrelic")
+        status = MarkLogicStatus(scheme=self.ml_scheme, user=self.ml_user, passwd=self.ml_pass, auth=self.ml_auth, host=self.ml_host, port=self.ml_port, verify=self.ml_verify)
         metrics = {}
-
         # retrieve summary status
         if self.plugin_summary_status:
-            cluster_status = status.get()
-            forest_summary = cluster_status['local-cluster-status']['status-relations']['forests-status'][
-                'forests-status-summary']
-            for metric in forest_summary:
-                if metric == 'cache-properties':
-                    cache_properties = forest_summary['cache-properties']
-                    for cp in cache_properties:
-                        metrics["Component/forests/cache/" + cp + "[" + cache_properties[cp]["units"] + "]"] = \
-                            cache_properties[cp]["value"]
-                else:
-                    metrics["Component/forests/" + metric + "[" + forest_summary[metric]["units"] + "]"] = \
-                        forest_summary[metric]["value"]
-
-            request_summary = cluster_status['local-cluster-status']['status-relations']['requests-status'][
-                'requests-status-summary']
-            for metric in request_summary:
-                metrics["Component/requests/" + metric + "[" + request_summary[metric]["units"] + "]"] = \
-                    request_summary[metric]["value"]
-
-            transaction_summary = cluster_status['local-cluster-status']['status-relations']['transactions-status'][
-                'transactions-status-summary']
-            for metric in transaction_summary:
-                metrics["Component/transactions/" + metric + "[" + transaction_summary[metric]["units"] + "]"] = \
-                    transaction_summary[metric]["value"]
-
-            server_summary = cluster_status['local-cluster-status']['status-relations']['servers-status'][
-                'servers-status-summary']
-            for metric in server_summary:
-                metrics["Component/servers/" + metric + "[" + server_summary[metric]["units"] + "]"] = \
-                    server_summary[metric]["value"]
-
-            host_summary = cluster_status['local-cluster-status']['status-relations']['hosts-status'][
-                'hosts-status-summary']
-            for metric in host_summary:
-                if metric == 'load-properties':
-                    metrics["Component/hosts/load/total-load[" + host_summary[metric]["total-load"]["units"] + "]"] = \
-                        host_summary[metric]["total-load"]["value"]
-                    for ld in host_summary[metric]["load-detail"]:
-                        metrics["Component/hosts/load/detail/" + ld + "[" + host_summary[metric]["load-detail"][ld][
-                            "units"] + "]"] = \
-                            host_summary[metric]["load-detail"][ld]["value"]
-                elif metric == 'rate-properties':
-                    metrics["Component/hosts/rate/total-rate[" + host_summary[metric]["total-rate"]["units"] + "]"] = \
-                        host_summary[metric]["total-rate"]["value"]
-                    for lr in host_summary[metric]["rate-detail"]:
-                        metrics["Component/hosts/rate/detail/" + lr + "[" + host_summary[metric]["rate-detail"][lr][
-                            "units"] + "]"] = \
-                            host_summary[metric]["rate-detail"][lr]["value"]
-                else:
-                    val = host_summary[metric]
-                    if type(val) is dict:
-                        metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = val["value"]
-                    else:
-                        metrics["Component/hosts/" + metric + "[quantity]"] = val
+            metrics.update(self.get_summary_status(status))
 
         # retrieve forest summary status
         if self.plugin_forests_summary_status:
-            forest_status = status.get(resource="forests")
-            forest_summary = forest_status['forest-status-list']['status-list-summary']
-            for metric in forest_summary:
-                if metric == 'cache-properties':
-                    cache_properties = forest_summary['cache-properties']
-                    for cp in cache_properties:
-                        metrics["Component/forests/cache/" + cp + "[" + cache_properties[cp]["units"] + "]"] = \
-                            cache_properties[cp]["value"]
-                elif metric == 'load-properties':
-                    load_properties = forest_summary['load-properties']
-                    metrics["Component/forests/load/total-load[" + load_properties["total-load"]["units"] + "]"] = \
-                        load_properties["total-load"]["value"]
-                    load_details = load_properties["load-detail"]
-                    for ld in load_details:
-                        metrics["Component/forests/load/detail/" + ld + "[" + load_details[ld]["units"] + "]"] = \
-                            load_details[ld]["value"]
-                elif metric == 'rate-properties':
-                    rate_properties = forest_summary['rate-properties']
-                    metrics["Component/forests/rate/total-rate[" + rate_properties["total-rate"]["units"] + "]"] = \
-                        rate_properties["total-rate"]["value"]
-                    rate_details = rate_properties["rate-detail"]
-                    for rd in rate_details:
-                        metrics["Component/forests/rate/detail/" + rd + "[" + rate_details[rd]["units"] + "]"] = \
-                            rate_details[rd]["value"]
-                else:
-                    val = forest_summary[metric]
-                    if type(val) is dict:
-                        metrics["Component/forests/" + metric + "[" + forest_summary[metric]["units"] + "]"] = \
-                            val["value"]
-                    else:
-                        metrics["Component/forests/" + metric + "[quantity]"] = val
+            metrics.update(self.get_resource_summary_status(status, "forests"))
 
         # retrieve host summary status
         if self.plugin_hosts_summary_status:
-            host_status = status.get(resource="hosts")
-            host_summary = host_status['host-status-list']['status-list-summary']
-            for metric in host_summary:
-                if metric == 'load-properties':
-                    metrics[
-                        "Component/hosts/load/total-load[" + host_summary[metric]["total-load"]["units"] + "]"] = \
-                        host_summary[metric]["total-load"]["value"]
-                    for ld in host_summary[metric]["load-detail"]:
-                        metrics["Component/hosts/load/detail/" + ld + "[" + host_summary[metric]["load-detail"][ld][
-                            "units"] + "]"] = \
-                            host_summary[metric]["load-detail"][ld]["value"]
-
-                elif metric == 'rate-properties':
-                    metrics[
-                        "Component/hosts/rate/total-rate[" + host_summary[metric]["total-rate"]["units"] + "]"] = \
-                        host_summary[metric]["total-rate"]["value"]
-                    for lr in host_summary[metric]["rate-detail"]:
-                        metrics["Component/hosts/rate/detail/" + lr + "[" + host_summary[metric]["rate-detail"][lr][
-                            "units"] + "]"] = \
-                            host_summary[metric]["rate-detail"][lr]["value"]
-                else:
-                    val = host_summary[metric]
-                    if type(val) is dict:
-                        metrics["Component/hosts/" + metric + "[" + host_summary[metric]["units"] + "]"] = val["value"]
-                    else:
-                        metrics["Component/hosts/" + metric + "[quantity]"] = val
+            metrics.update(self.get_resource_summary_status(status, "hosts"))
 
         # retrieve server summary status
         if self.plugin_servers_summary_status:
-            server_status = status.get(resource="servers")
-            server_summary = server_status['server-status-list']['status-list-summary']
-            for ss in server_summary:
-                metrics["Component/servers/" + ss + "[" + server_summary[ss]["units"] + "]"] = \
-                    server_summary[ss]["value"]
+            metrics.update(self.get_resource_summary_status(status, "servers"))
 
         # retrieve specific database detail status
         if self.plugin_databases:
-            for db in re.split(" ", self.plugin_databases):
-                database_status = status.get(resource="databases", name=db)
-                database_detail = database_status["database-status"]["status-properties"]
-                for dd in database_detail:
-                    units=None
-                    if "units" in database_detail[dd]:
-                        units = database_detail[dd]["units"]
-                    if dd == "load-properties":
-                        database_load_details = database_status["database-status"]["status-properties"]["load-properties"]["load-detail"]
-                        for dld in database_load_details:
-                            load_units = None
-                            if "units" in database_load_details[dld]:
-                                load_units = database_load_details[dld]["units"]
-                            if not load_units:
-                                metrics["Component/databases/" + db + "/load/" + dld] = database_load_details[dld]
-                            else:
-                                metrics["Component/databases/" + db + "/load/" + dld + "[" + load_units + "]"] = \
-                                    database_load_details[dld]["value"]
-                    elif dd == "rate-properties":
-                        database_rate_details = database_status["database-status"]["status-properties"]["rate-properties"]["rate-detail"]
-                        for drd in database_rate_details:
-                            rate_units = None
-                            if "units" in database_rate_details[drd]:
-                                rate_units = database_rate_details[drd]["units"]
-                            if not rate_units:
-                                metrics["Component/databases/" + db + "/rate/" + drd] = database_rate_details[drd]
-                            else:
-                                metrics["Component/databases/" + db + "/rate/" + drd + "[" + rate_units + "]"] = \
-                                    database_rate_details[drd]["value"]
-                    elif dd == "cache-properties":
-                        database_cache_details = \
-                        database_status["database-status"]["status-properties"]["cache-properties"]
-                        for dcd in database_cache_details:
-                            cache_units = None
-                            if "units" in database_cache_details[dcd]:
-                                cache_units = database_cache_details[dcd]["units"]
-                            if not cache_units:
-                                metrics["Component/databases/" + db + "/cache/" + dcd] = database_cache_details[dcd]
-                            else:
-                                metrics["Component/databases/" + db + "/cache/" + dcd + "[" + cache_units + "]"] = \
-                                    database_cache_details[dcd]["value"]
-                    elif re.match(
-                            "local-disk-failover|database-replication-status|flexible-replication-enabled|cpf-enabled",
-                            dd):
-                        log.debug("ignoring " + dd)
-                    elif not units:
-                        metrics["Component/databases/" + db + "/" + dd] = database_detail[dd]
-                    else:
-                        metrics["Component/databases/" + db + "/" + dd + "[" + units + "]"] = \
-                            database_detail[dd]["value"]
+            metrics.update(self.get_database_detail_status(status, self.plugin_databases))
 
         # retrieve specific host detail status
         if self.plugin_hosts:
-            metrics.update(self.getHostDetailStatus(status,self.plugin_hosts))
+            metrics.update(self.get_host_detail_status(status, self.plugin_hosts))
+
         # retrieve specific forest detail status
         if self.plugin_forests:
-            metrics.update(self.getForestDetailStatus(status,self.plugin_forests))
+            metrics.update(self.get_forest_detail_status(status, self.plugin_forests))
 
         # retrieve specific group detail status
         if self.plugin_groups:
-            metrics.update(self.getGroupDetailStatus(status,self.plugin_groups))
+            metrics.update(self.get_group_detail_status(status, self.plugin_groups))
 
         # retrieve specific server detail status
         if self.plugin_servers:
-            metrics.update(self.getServerDetailStatus(status, self.plugin_servers))
+            metrics.update(self.get_server_detail_status(status, self.plugin_servers))
 
-        update_newrelic = newrelic_utils.NewRelicUtility.update_newrelic(self,
-                                                                         host=self.ml_host,
-                                                                         pid=1,
-                                                                         version=__version__,
-                                                                         name=self.plugin_name,
-                                                                         guid=self.plugin_guid,
-                                                                         duration=self.plugin_duration,
-                                                                         metrics=metrics,
-                                                                         key=self.nr_license_key,
-                                                                         http_proxy=self.nr_http_proxy,
-                                                                         https_proxy=self.nr_https_proxy)
+        update_newrelic = newrelic_utils.NewRelicUtility().update_newrelic(host=self.ml_host,
+                                                                           pid=1,
+                                                                           version=__version__,
+                                                                           name=self.plugin_name,
+                                                                           guid=self.plugin_guid,
+                                                                           duration=self.plugin_duration,
+                                                                           metrics=metrics,
+                                                                           key=self.nr_license_key,
+                                                                           http_proxy=self.nr_http_proxy,
+                                                                           https_proxy=self.nr_https_proxy)
 
         if "error" in update_newrelic:
-            log.error(update_newrelic["error"])
+            LOG.error(update_newrelic["error"])
         else:
-            log.debug("update status: " + json.dumps(update_newrelic))
+            LOG.debug("update status: %s", json.dumps(update_newrelic))
 
-    def getHostDetailStatus(self,status,hosts):
-        metrics={}
-        log.debug("DEBUG: hosts: " + hosts)
-        for host in re.split(" ", hosts):
-            host_status = status.get(resource="hosts", name=host)
-            host_detail = host_status["host-status"]["status-properties"]
-            for hd in host_detail:
-                if re.match("online|secure", hd):
-                    log.debug("ignoring " + hd)
-                elif hd == "load-properties":
-                    host_load_details = \
-                        host_status["host-status"]["status-properties"]["load-properties"]["load-detail"]
-                    for hld in host_load_details:
-                        load_units = None
-                        if "units" in host_load_details[hld]:
-                            load_units = host_load_details[hld]["units"]
-                        if not load_units:
-                            metrics["Component/hosts/" + host + "/load/" + hld] = host_load_details[hld]
-                        else:
-                            metrics["Component/hosts/" + host + "/load/" + hld + "[" + load_units + "]"] = \
-                                host_load_details[hld]["value"]
-                elif hd == "rate-properties":
-                    host_rate_details = \
-                        host_status["host-status"]["status-properties"]["rate-properties"]["rate-detail"]
-                    for hrd in host_rate_details:
-                        rate_units = None
-                        if "units" in host_rate_details[hrd]:
-                            rate_units = host_rate_details[hrd]["units"]
-                        if not rate_units:
-                            metrics["Component/hosts/" + host + "/rate/" + hrd] = host_rate_details[hrd]
-                        else:
-                            metrics["Component/hosts/" + host + "/rate/" + hrd + "[" + rate_units + "]"] = \
-                                host_rate_details[hrd]["value"]
-                elif hd == "status-detail":
-                    host_status_detail = host_detail["status-detail"]
-                    for hsd in host_status_detail:
-                        units = None
-                        try:
-                            if 'units' in host_status_detail[hsd]:
-                                units = host_status_detail[hsd]["units"]
-                        except Exception as e:
-                            log.debug("has no units " + hsd)
-                        if re.match("license-key-options", hsd):
-                            log.debug("ignoring " + hsd)
-                        elif not units:
-							#log.debug("Error no associated units: " + hsd)
-							#metrics["Component/hosts/" + host + "/" + hsd] = host_detail["status-detail"][hsd]
-							if type(host_status_detail[hsd]) == int :
-								log.debug("units INT: " +hsd)
-								metrics["Component/hosts/" + host + "/" + hsd + "[INT]"] =  host_status_detail[hsd]
-							elif type(host_status_detail[hsd]) == float :
-								log.debug("units FLOAT: " +hsd)
-								metrics["Component/hosts/" + host + "/" + hsd + "[FLOAT]"] =  host_status_detail[hsd]
-							else:
-								log.debug("No units: " + hsd)
-                        else:
-                            metrics["Component/hosts/" + host + "/" + hsd + "[" + units + "]"] = \
-                            host_status_detail[hsd]["value"]
-        return metrics
-
-    def getForestDetailStatus(self,status,forests):
-        metrics={}
-        for forest in re.split(" ", forests):
-            forest_status = status.get(resource="forests", name=forest)
-            forest_detail = forest_status["forest-status"]["status-properties"]
-            for fd in forest_detail:
-                units = None
-                if "units" in forest_detail[fd]:
-                    units = forest_detail[fd]["units"]
-                if re.match("license-key-options", fd):
-                    log.debug("ignoring " + fd)
-                elif fd == "stands":
-                    log.debug("ignoring forest stands")
-                elif not units:
-                    metrics["Component/forests/" + forest + "/" + fd] = forest_detail[fd]
-                else:
-                    metrics["Component/forests/" + forest + "/" + fd + "[" + units + "]"] = \
-                        forest_detail[fd]["value"]
-        return metrics
-
-    def getGroupDetailStatus(self, status, groups):
+    @classmethod
+    def get_summary_status(cls, status):
+        """
+        Retrieve the cluster status and return a dict with summary metrics
+        :param status:
+        :return:
+        """
         metrics = {}
-        for group in re.split(" ", groups):
-            group_status = status.get(resource="groups", name=group)
-            group_detail = group_status["group-status"]["status-properties"]
-            for gd in group_detail:
-                units = None
-                if "units" in group_detail[gd]:
-                    units = group_detail[gd]["units"]
-                if gd == "hosts-status-summary":
-                    metrics["Component/groups/" + group + "/hosts/total-hosts[quantity]"] = \
-                        group_detail["hosts-status-summary"]["total-hosts"]["value"]
-                elif gd == "servers-status-properties":
-                    log.debug("ignoring group servers-status-properties")
-                elif gd == "servers-status-summary":
-                    log.debug("ignoring group servers-status-summary")
-                else:
-                    log.debug("ignoring group " + gd)
+        LOG.debug("Retrieving cluster status")
+        cluster_status = status.get()
+        status_relations = cluster_status['local-cluster-status']['status-relations']
+        for relation in status_relations:
+            status_relation = status_relations[relation]
+            prefix = "Component/" + status_relation["typeref"] + "/"
+            summary_obj = status_relation[relation + "-summary"]
+            for key in summary_obj:
+                cls.process_metric(metrics, prefix, summary_obj, key)
         return metrics
 
-    def getServerDetailStatus(self,status,servers):
+    @classmethod
+    def get_resource_summary_status(cls, status, resource):
+        """
+        Retrieve the summary status for the given resource and return a dict with the parsed metrics
+        :param status:
+        :param resource:
+        :return:
+        """
         metrics = {}
-        for servergroup in re.split(" ", servers):
-            s = servergroup.split(":")
-            server = s[0]
-            group = s[1]
-            if server and group:
+        LOG.debug("Retrieving resource %s", resource)
+        resource_status = status.get(resource=resource)
+
+        prefix = "Component/" + resource + "/"
+        for status_key in resource_status:
+            if status_key.endswith("-status-list"):
+                properties = resource_status[status_key]["status-list-summary"]
+                for key in properties:
+                    cls.process_metric(metrics, prefix, properties, key)
+        return metrics
+
+    @classmethod
+    def get_database_detail_status(cls, status, databases):
+        return cls.get_resource_detail_status(status, "databases", databases)
+
+    @classmethod
+    def get_host_detail_status(cls, status, hosts):
+        return cls.get_resource_detail_status(status, "hosts", hosts)
+
+    @classmethod
+    def get_forest_detail_status(cls, status, forests):
+        return cls.get_resource_detail_status(status, "forests", forests)
+
+    @classmethod
+    def get_group_detail_status(cls, status, groups):
+        return cls.get_resource_detail_status(status, "groups", groups)
+
+    @classmethod
+    def get_server_detail_status(cls, status, servers):
+        """
+        Retrieve the status for each of the space separated server:group (colon separated) combinations and return a
+        dict with the parsed metrics
+        :param status:
+        :param servers:
+        :return:
+        """
+        metrics = {}
+        for server_group in re.split(" ", servers):
+            server_group_tuple = server_group.split(":")
+            if len(server_group_tuple) == 2:
+                server, group = server_group_tuple
+                LOG.debug("Requesting server details for name: " + server + " group: " + group)
                 server_status = status.get(resource="servers", name=server, group=group)
-                server_detail = server_status["server-status"]["status-properties"]
-                for sd in server_detail:
-                    units=None
-                    try:
-                        if "units" in server_detail[sd]:
-                            units = server_detail[sd]["units"]
-                    except Exception as e:
-                        log.debug("has no units " + sd)
-                    if sd == "host-detail":
-                        server_host_details = \
-                            server_status["server-status"]["status-properties"]["host-detail"]
-                        for shd in server_host_details:
-                            log.debug(shd)
-                            # host_units = None
-                            # if "units" in server_host_details[shd]:
-                            #     host_units = server_host_details[shd]["units"]
-                            # if re.match("relation-id|url-rewriter", shd):
-                            #     log.debug("ignoring " + shd)
-                            # elif not host_units:
-                            #     metrics["Component/servers/" + server + "/host/" + shd] = server_host_details[shd]
-                            # else:
-                            #     metrics["Component/servers/" + server + "/host/" + shd + "[" + host_units + "]"] = \
-                            #         server_host_details[shd]["value"]
-                    elif re.match("root|output-encoding|error-handler|url-rewriter", sd):
-                        log.debug("ignoring " + sd)
-                    elif not units:
-                        metrics["Component/servers/" + server + "/" + sd] = server_detail[sd]
-                    else:
-                        metrics["Component/servers/" + server + "/" + sd + "[" + units + "]"] = \
-                            server_detail[sd]["value"]
+                prefix = "Component/servers/" + server + "/"
+                metrics.update(cls.process_status(prefix, server_status))
             else:
-                log.error("cannot retrieve " + server + " server status, check configuration")
+                LOG.error("cannot retrieve %s server status, check configuration", server_group)
+        return metrics
+
+    @classmethod
+    def get_resource_detail_status(cls, status, resource_type, resource_names):
+        """
+        Retrieve the resource for each of the (space separated) resource names and return a dict with the parsed metrics
+        :param status:
+        :param resource_type:
+        :param resource_names:
+        :return:
+        """
+        metrics = {}
+        for name in re.split(" ", resource_names):
+            LOG.debug("Retrieving " + resource_type + ": " + name)
+            resource_status = status.get(resource=resource_type, name=name)
+            prefix = "Component/" + resource_type + "/" + name + "/"
+            metrics.update(cls.process_status(prefix, resource_status))
+        return metrics
+
+    @classmethod
+    def process_status(cls, prefix, status_obj):
+        """
+        Process the status response and return a dict with each of the status-properties children
+        :param prefix:
+        :param status_obj:
+        :return:
+        """
+        metrics = {}
+        for status_key, status in status_obj.items():
+            if status_key.endswith("-status") and isinstance(status, dict):
+                properties = status["status-properties"]
+                for key in properties:
+                    cls.process_metric(metrics, prefix, properties, key)
         return metrics
 
     @staticmethod
+    def label_units(obj, metric):
+        """
+        Returns the label, conditionally with a metric suffix if units are specified
+        :param obj:
+        :param metric:
+        :return:
+        """
+        label = metric
+        if isinstance(obj[metric], dict):
+            units = obj[metric].get("units", "")
+            # ensure that it isn't blank
+            if units.strip():
+                label += "[" + units + "]"
+        return label
+
+    @classmethod
+    def set_metric(cls, metrics, prefix, obj, key):
+        """
+        Add a metric for the property specified
+        :param metrics:
+        :param prefix:
+        :param obj:
+        :param key:
+        :return:
+        """
+        value = obj[key]
+        if isinstance(value, dict):
+            value = value.get("value")
+        LOG.debug(str(key) + "=" + str(value))
+        metrics[prefix + cls.label_units(obj, key)] = value
+
+    @classmethod
+    def process_metric(cls, metrics, prefix, obj, prop,
+                       ignore_pattern="backup-job|.*-cache-partition$|database-replication-status|error-handler" \
+                                      "|license-key-option|local-disk-failover|output-encoding|root$" \
+                                      "|shared-disk-failover|stand$|url-rewriter"):
+        """
+        Evaluate whether the property in the given object should be skipped, added to metrics dic,
+        or continue walking the object
+        :param metrics:
+        :param prefix:
+        :param obj:
+        :param prop:
+        :param ignore_pattern:
+        :return:
+        """
+        if ignore_pattern and re.match(ignore_pattern, prop):
+            LOG.debug("ignoring: %s", prop)
+        else:
+            value = obj[prop]
+            if isinstance(value, dict):
+                if prop.endswith("-status-summary"):
+                    metric = prop[:prop.index("-status-summary")]
+                    metric_prefix = prefix + metric + "/"
+                    for key in value:
+                        cls.process_metric(metrics, metric_prefix, value, key)
+                elif prop.endswith("-properties"):
+                    metric = prop[:prop.index("-properties")]
+                    metric_prefix = prefix + metric + "/"
+                    for key in value:
+                        cls.process_metric(metrics, metric_prefix, value, key)
+                elif prop.endswith("-detail"):
+                    metric_prefix = prefix
+                    #  maintaining for backwards compatability (for now), but I don't like how get_host_detail_status breaks the convention for *-detail properties
+                    if prop != "status-detail":
+                        metric_prefix += "detail/"
+                    for detail in value:
+                        cls.process_metric(metrics, metric_prefix, value, detail)
+                elif value.get("units", "") == "bool":
+                    LOG.debug("ignoring: %s", prop)
+                else:
+                    cls.set_metric(metrics, prefix, obj, prop)
+            elif isinstance(value, list):
+                if prop == "host-detail":
+                    # host details can be obtained from get_host_detail_status, ignoring in get_server_detail_status
+                    LOG.debug("Ignoring host-detail")
+                else:
+                    metric_prefix = prefix + prop + "/"
+                    for value_obj in value:
+                        if isinstance(value_obj, dict):
+                            for key in value_obj:
+                                cls.process_metric(metrics, metric_prefix, value_obj, key)
+            else:
+                cls.set_metric(metrics, prefix, obj, prop)
+
+    @staticmethod
+    def singular(value):
+        """
+        Remove trailing "s" from the given string value and return
+        """
+        if value.endswith('s'):
+            return value[:-1]
+        return value
+
+    @staticmethod
     def usage():
-        log.debug("output usage instructions")
+        LOG.debug("output usage instructions")
         print("""newrelic_marklogic v%s - NewRelic plugin for monitoring MarkLogic.
 
 usage: ./newrelic_marklogic.py [-h] [-c config file] [-l log file]
@@ -484,5 +393,5 @@ usage: ./newrelic_marklogic.py [-h] [-c config file] [-l log file]
     -c config file               (default: %s)
     -l log file                  (default: %s)
     """ % (__version__,
-           decl['confFile'],
-           decl['logFile']))
+           DECL['confFile'],
+           DECL['logFile']))

@@ -1,5 +1,5 @@
 #
-# Copyright 2016 MarkLogic Corporation
+# Copyright 2019 MarkLogic Corporation
 #
 # Licensed under the Apache License, Version 2.0 (the "License");
 # you may not use this file except in compliance with the License.
@@ -19,6 +19,11 @@
 # Scheme to use when accessing MarkLogic management REST API (http|https).
 scheme = http
 
+# (optional) Either a boolean, in which case it controls whether we verify
+# the server's TLS certificate, or a string, in which case it must be a path
+# to a CA bundle to use. Defaults to ``False``.
+verify = False
+
 # Host to use when accessing MarkLogic management REST API (FQDN hostname).
 host = localhost
 
@@ -36,7 +41,7 @@ pass = admin
 
 [newrelic]
 
-# Your NewRelic license key.
+# Your New Relic license key.
 key =
 
 # Proxy (ex. http://10.10.1.10:3128).
@@ -45,10 +50,10 @@ https_proxy =
 
 [plugin]
 
-# NewRelic plugin display name.
+# New Relic plugin display name.
 name = marklogic
 
-# Unique NewRelic plugin guid.
+# Unique New Relic plugin guid.
 guid = com.marklogic
 
 # Sample period in seconds.
@@ -58,28 +63,28 @@ duration = 60
 log_level = INFO
  
 # Local cluster summary.
-summary_status= True
+summary_status = True
 
 # Database(s) detail status.
-databases=
+databases =
 
 # Hosts summary.
-hosts_summary_status= False
+hosts_summary_status = False
 
 # Host(s) detail status.
-hosts=
+hosts =
 
 # Forests summary.
-forests_summary_status= False
+forests_summary_status = False
 
 # Forest(s) detail status.
-forests=
+forests =
 
 # Group(s) detail status.
-groups=
+groups =
 
 # Servers summary.
-servers_summary_status= False
+servers_summary_status = False
 
 # Server(s) detail status (must supply group name ex. ServerName:GroupName).
-servers=
+servers =
