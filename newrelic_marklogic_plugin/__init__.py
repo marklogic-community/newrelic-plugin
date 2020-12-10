@@ -111,11 +111,16 @@ class RunPlugin(object):
     def run(self):
         LOG.info("newrelic_marklogic plugin now sending statuses to NewRelic Plugin API (to see more log messages change log_level=DEBUG).")
         while True:
+            start = time.perf_counter()
             try:
                 self.statusUpdate()
             except Exception as exception:
                 LOG.error(exception)
-            time.sleep(self.plugin_duration)
+            end = time.perf_counter()
+            processing_time = end - start
+            sleep_duration = max(1, self.plugin_duration - processing_time)
+            LOG.debug("statusUpdate took: %s, sleeping for: %s", processing_time, sleep_duration)
+            time.sleep(sleep_duration)
 
     def statusUpdate(self):
         """
