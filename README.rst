@@ -1,7 +1,15 @@
-newrelic-marklogic-plugin
+newrelic-marklogic-plugin is DEPRECATED
 =========================
 
+`New Relic Plugins are EOL <https://discuss.newrelic.com/t/new-relic-plugin-eol-wednesday-june-16th-2021/127267>`_ and have been deprecated in favor of `New Relic Integrations <https://docs.newrelic.com/docs/integrations/>`_. 
+
+ On Wednesday, June 16th, 2021, New Relic will no longer support or maintain Plugins 192. Any plugin that is currently in use should be replaced by the New Relic Infrastructure agent 166. Along with support and maintenance, we will be removing access to the current plugin pages on the New Relic One platform.
+
+The `New Relic Flex agent <https://github.com/newrelic/nri-flex>`_ is a recommended alternative to the newrelic-marklogic-plugin. There are `examples <https://github.com/newrelic/nri-flex/tree/master/examples>`_ of YAML files demonstrating how to leverage the New Relic Flex agent to retrieve MarkLogic Manage API statistics and send to New Relic, similar to how the newrelic-marklogic-plugin used to. 
+ 
+
 `NewRelic <http://www.newrelic.com>`__ plugin for monitoring MarkLogic.
+########
 
 Features
 --------
